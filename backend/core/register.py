@@ -27,7 +27,7 @@ def register_app():
 
 def register_static_file(app: FastAPI):
     """
-    静态文件交互开发模式, 生产使用 nginx 静态资源服务
+    nginx
 
     :param app:
     :return:
@@ -40,3 +40,8 @@ def register_static_file(app: FastAPI):
         if not os.path.exists(STATIC_DIR):
             os.mkdir(STATIC_DIR)
         app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
+
+
+def register_middleware(app: FastAPI):
+    pass
+

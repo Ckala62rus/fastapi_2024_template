@@ -20,19 +20,19 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal['dev', 'pro']
 
     # Env MySQL
-    MYSQL_HOST: str
-    MYSQL_PORT: int
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
+    # MYSQL_HOST: str
+    # MYSQL_PORT: int
+    # MYSQL_USER: str
+    # MYSQL_PASSWORD: str
 
     # Env Redis
-    REDIS_HOST: str
-    REDIS_PORT: int
-    REDIS_PASSWORD: str
-    REDIS_DATABASE: int
+    # REDIS_HOST: str
+    # REDIS_PORT: int
+    # REDIS_PASSWORD: str
+    # REDIS_DATABASE: int
 
     # Redis
-    REDIS_TIMEOUT: int = 5
+    # REDIS_TIMEOUT: int = 5
 
     # FastAPI
     API_V1_STR: str = '/api/v1'
@@ -43,12 +43,12 @@ class Settings(BaseSettings):
     REDOCS_URL: str | None = f'{API_V1_STR}/redocs'
     OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
-    @model_validator(mode='before')
-    @classmethod
-    def validate_openapi_url(cls, values):
-        if values['ENVIRONMENT'] == 'pro':
-            values['OPENAPI_URL'] = None
-        return values
+    # @model_validator(mode='before')
+    # @classmethod
+    # def validate_openapi_url(cls, values):
+    #     if values['ENVIRONMENT'] == 'pro':
+    #         values['OPENAPI_URL'] = None
+    #     return values
 
     # Static Server
     STATIC_FILES: bool = False
