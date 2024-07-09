@@ -2,9 +2,9 @@ from fastapi import FastAPI
 
 __all__ = ['register_app']
 
-from backend.core.config import settings
-from backend.core.path_conf import STATIC_DIR
-from backend.utils.serializer import MsgSpecJSONResponse
+from core.config import settings
+from core.path_conf import STATIC_DIR
+from utils.serializer import MsgSpecJSONResponse
 
 
 def register_app():

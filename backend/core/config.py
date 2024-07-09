@@ -4,7 +4,7 @@ from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
-from backend.core.path_conf import BasePath
+from core.path_conf import BasePath
 
 
 class Settings(BaseSettings):
@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
+    # ENVIRONMENT: str = 'dev'
 
     # Env MySQL
     # MYSQL_HOST: str
