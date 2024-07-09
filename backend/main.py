@@ -2,6 +2,7 @@ from pathlib import Path
 
 import uvicorn
 
+from common.log import log
 # from backend.common.log import log
 from core.register import register_app
 
@@ -10,8 +11,8 @@ app = register_app()
 
 @app.get("/")
 def read_root():
-    # log.info("testing logging info")
-    # log.error("testing logging with error")
+    log.info("testing logging info")
+    log.error("testing logging with error2")
     a = 1 + 30
     return {"Hello": "World123"}
 

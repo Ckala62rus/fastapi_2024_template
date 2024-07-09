@@ -3,8 +3,8 @@ import os
 import loguru
 from loguru import logger
 
-from backend.core import path_conf
-from backend.core.config import settings
+from core import path_conf
+from core.config import settings
 
 
 class Logger:
