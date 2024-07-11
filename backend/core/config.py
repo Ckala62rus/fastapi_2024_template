@@ -18,7 +18,14 @@ class Settings(BaseSettings):
 
     # Env Config
     ENVIRONMENT: Literal['dev', 'pro']
-    # ENVIRONMENT: str = 'dev'
+
+    # DateTime
+    DATETIME_TIMEZONE: str = 'Europe/Moscow'
+    DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
+
+    # Middleware
+    MIDDLEWARE_CORS: bool = True
+    MIDDLEWARE_ACCESS: bool = False
 
     # Env MySQL
     # MYSQL_HOST: str
@@ -67,10 +74,6 @@ class Settings(BaseSettings):
     # Log
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'
-
-    # Middleware
-    MIDDLEWARE_CORS: bool = True
-    MIDDLEWARE_ACCESS: bool = False
 
 
 # Декоратор lru_cache для хэширования конфига, что бы при следующих обращениях брался его кеш

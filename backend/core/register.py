@@ -2,8 +2,11 @@ from fastapi import FastAPI
 
 __all__ = ['register_app']
 
+from starlette.middleware.cors import CORSMiddleware
+
 from core.config import settings
 from core.path_conf import STATIC_DIR
+from middleware.access_middleware import AccessMiddleware
 from utils.serializer import MsgSpecJSONResponse
 
 
@@ -21,6 +24,7 @@ def register_app():
     )
 
     register_static_file(app)
+    register_middleware(app)
 
     return app
 
@@ -43,5 +47,16 @@ def register_static_file(app: FastAPI):
 
 
 def register_middleware(app: FastAPI):
-    pass
+    # Access log handler
+    if settings.MIDDLEWARE_ACCESS:
+        app.add_middleware(AccessMiddleware)
 
+    # CORS: Always at the end
+    if settings.MIDDLEWARE_CORS:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=['*'],
+            allow_credentials=True,
+            allow_methods=['*'],
+            allow_headers=['*'],
+        )
