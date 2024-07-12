@@ -12,6 +12,8 @@ uvicorn = "^0.30.1"
 pydantic-settings = "^2.3.4"
 msgspec = "^0.18.6"
 loguru = "^0.7.2"
+pyjwt = "^2.8.0"
+passlib = "^1.7.4"
 
 
 [build-system]
