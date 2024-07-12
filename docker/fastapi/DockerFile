@@ -27,7 +27,8 @@ COPY ./backend/pyproject.toml /app/
 COPY ./backend/poetry.lock /app/
 
 RUN pip install poetry
-RUN poetry install --no-dev
+# RUN poetry install --no-dev
+RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
 
 RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
     && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
@@ -37,6 +38,8 @@ ENV TZ = Europa/Moscow
 RUN mkdir -p /var/log/fastapi_server
 
 # COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
+
+CMD ["timedatectl", "set-timezone" "Europe/Moscow"]
 
 EXPOSE 8001
 
