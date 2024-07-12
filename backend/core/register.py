@@ -45,6 +45,7 @@ def register_app():
 
     register_static_file(app)
     register_middleware(app)
+    register_router(app)
 
     return app
 
@@ -80,3 +81,8 @@ def register_middleware(app: FastAPI):
             allow_methods=['*'],
             allow_headers=['*'],
         )
+
+
+def register_router(app: FastAPI):
+    # register api endpoints here.
+    app.include_router(main_router)
