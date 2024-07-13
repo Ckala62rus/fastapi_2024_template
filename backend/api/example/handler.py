@@ -9,7 +9,8 @@ from api.example.schemas import (
 )
 from common.response.response_chema import response_base, ResponseModel
 from common.response.response_code import CustomResponseCode
-from common.security.jwt import DependsJwtAuth
+from common.security.auth_service import auth_service
+from middleware.auth_jwt_middleware import JWTBearer
 
 router = APIRouter()
 
@@ -26,13 +27,11 @@ router = APIRouter()
     },
 )
 async def hello_world(request: Request) -> ResponseModel:
+
+    res = await auth_service.login(login='admin@mail.ru', password='123123')
+
     return await response_base.success(
-        data={
-            "id": 1,
-            "name": "some name",
-            "age": "some age",
-            "phone": "88005553535",
-        }
+        data=res
     )
 
 
@@ -152,3 +151,13 @@ async def hello_world_delete_by_id(
             "id": hello_id,
         }
     )
+
+
+@router.get(
+    "/protected",
+    summary="protected endpoint",
+    description="test protected endpoint",
+    dependencies=[Depends(JWTBearer())],
+)
+async def protected_route(request: Request):
+    return await response_base.success(data={"access": "success"})
