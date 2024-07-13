@@ -71,6 +71,11 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/auth/login',
     ]
 
+    # JWT
+    JWT_SECRET: str = 'veryVerySecretKey'
+    JWT_ALGORITHM: str = 'HS256'
+    TOKEN_TIME_EXPIRES: int = 60
+
     # Log
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'

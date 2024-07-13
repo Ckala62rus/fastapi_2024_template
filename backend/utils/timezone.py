@@ -32,5 +32,8 @@ class TimeZone:
         """
         return datetime.strptime(date_str, format_str).replace(tzinfo=self.tz_info)
 
+    def datetime_to_format(self, dt: datetime, format_str: str = settings.DATETIME_FORMAT) -> str:
+        return dt.strftime(format_str)
+
 
 timezone = TimeZone()
