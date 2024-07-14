@@ -1,16 +1,24 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 WORKDIR /app
 
 COPY ./backend/requirements.txt /app/requirements.txt
 
-RUN apt-get update && apt-get install mc -y
+# RUN apt-get update && apt-get install mc -y
+#
+# RUN apt-get install supervisor -y
+# RUN apt-get install curl -y
+# RUN apt-get install bash -y
+# RUN apt-get install nano -y
+# RUN apt-get install systemd -y
 
-RUN apt-get install supervisor -y
-RUN apt-get install curl -y
-RUN apt-get install bash -y
-RUN apt-get install nano -y
-RUN apt-get install systemd -y
+RUN apt-get update && \
+    apt-get install -y mc && \
+    apt-get install -y supervisor && \
+    apt-get install -y curl && \
+    apt-get install -y bash && \
+    apt-get install -y nano && \
+    apt-get install -y systemd
 
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
@@ -26,7 +34,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 COPY ./backend/pyproject.toml /app/
 COPY ./backend/poetry.lock /app/
 
-RUN pip install poetry
+RUN pip install poetry && rm -rf /var/cache/apt
 # RUN poetry install --no-dev
 RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
 
