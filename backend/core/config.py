@@ -33,6 +33,16 @@ class Settings(BaseSettings):
     # MYSQL_USER: str
     # MYSQL_PASSWORD: str
 
+    # POSTGRES
+    POSTGRES_USER: str = 'postgres'
+    POSTGRES_PASSWORD: str = 'postgres'
+    POSTGRES_DB: str = 'postgres'
+    POSTGRES_PORT: str = '5432'
+    POSTGRES_HOST: str = 'db_fastapi_2024'
+    # POSTGRES_HOST_ALEMBIC: str = '127.0.0.1'
+    SQLALCHEMY_DATABASE_URL: str = f'postgresql+psycopg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
+    SQLALCHEMY_DATABASE_URL_FOR_ALEMBIC: str = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
+
     # Env Redis
     # REDIS_HOST: str
     # REDIS_PORT: int
