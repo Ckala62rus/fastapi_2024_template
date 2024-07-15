@@ -57,11 +57,11 @@ alembic downgrade -1 (удаление всех миграций)
 3. Celery Flower
 4. Redis
 5. RabbitMQ
-6. Миграции Alembic
+6. Миграции Alembic (+)
 7. Попробовать пересоздать контейнер на базе Slim
 8. CRUD для MongoDB
 9. GreadFS для MongoDB
-10. Добавить SQLAlchemy
+10. Добавить SQLAlchemy (+)
 11. Реализовать регистрацию пользователей.
 12. Тестирование
 
