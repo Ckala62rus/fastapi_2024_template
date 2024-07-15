@@ -27,10 +27,10 @@ class CustomResponseCode(CustomCodeBase):
     """Response codes"""
 
     HTTP_200 = (200, 'OK')
-    HTTP_201 = (201, 'empty')
+    HTTP_201 = (201, 'Entity was created')
     HTTP_202 = (202, 'empty')
     HTTP_204 = (204, 'empty')
-    HTTP_400 = (400, 'empty')
+    HTTP_400 = (400, 'Bad Request')
     HTTP_401 = (401, 'empty')
     HTTP_403 = (403, 'empty')
     HTTP_404 = (404, 'Not found')

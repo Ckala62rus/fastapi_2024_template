@@ -2,17 +2,19 @@ from pydantic import EmailStr
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import mapped_column, Mapped
 
-from core.db import Base
+from common.model import Base, id_key
+
+
+# from core.db import Base
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, unique=True, index=True)
-    name = Column(String, unique=True)
-    date = Column(DateTime, nullable=True)
+    id: Mapped[id_key] = mapped_column(init=False)
+    username: Mapped[str] = mapped_column(String(20), unique=True, index=True, comment='Ник')
     email: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     password: Mapped[str | None] = mapped_column(String(255))
-
-    class ConfigDict:
-        from_attributes = True
+    refresh_token: Mapped[str | None] = mapped_column(String(255))
+    is_superuser: Mapped[bool] = mapped_column(default=False, comment='Админ')
+    is_staff: Mapped[bool] = mapped_column(default=False, comment='Фоновое управление')
