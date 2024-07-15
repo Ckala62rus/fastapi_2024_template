@@ -27,3 +27,16 @@ class AuthSchemaCreate(AuthSchemaBase):
     id: int
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+class AuthSchemaCreatedNewUser(SchemaBase):
+    id: int
+    email: EmailStr
+    username: str
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class AuthLoginSchema(SchemaBase):
+    email: EmailStr
+    password: str | None

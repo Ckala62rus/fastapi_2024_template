@@ -61,12 +61,12 @@ class Settings(BaseSettings):
     REDOCS_URL: str | None = f'{API_V1_STR}/redocs'
     OPENAPI_URL: str | None = f'{API_V1_STR}/openapi'
 
-    # @model_validator(mode='before')
-    # @classmethod
-    # def validate_openapi_url(cls, values):
-    #     if values['ENVIRONMENT'] == 'pro':
-    #         values['OPENAPI_URL'] = None
-    #     return values
+    @model_validator(mode='before')
+    @classmethod
+    def validate_openapi_url(cls, values):
+        if values['ENVIRONMENT'] == 'prod':
+            values['OPENAPI_URL'] = None
+        return values
 
     # Static Server
     STATIC_FILES: bool = False
