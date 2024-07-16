@@ -62,7 +62,7 @@ alembic downgrade -1 (удаление всех миграций)
 8. CRUD для MongoDB
 9. GreadFS для MongoDB
 10. Добавить SQLAlchemy (+)
-11. Реализовать регистрацию пользователей.
+11. Реализовать регистрацию пользователей. (+)
 12. Тестирование
 
 
@@ -70,3 +70,12 @@ alembic downgrade -1 (удаление всех миграций)
 - host name default => db_fastapi_2024
 - login => postgres
 - password => 123123
+
+
+#### Testing
+
+1. Создать базу test_db
+2. Запуск тестов
+```Bash
+pytest -vs --disable-warnings
+```

@@ -6,6 +6,7 @@ from fastapi import (
     Body,
     Depends
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.requests import Request
 
@@ -17,7 +18,7 @@ from api.user.schemas import (
 from api.user.service import UserService
 from common.response.response_chema import response_base
 from common.response.response_code import CustomResponseCode
-from core.db import async_db_session
+from core.db import get_db
 from middleware.auth_jwt_middleware import JWTBearer
 
 router = APIRouter()
@@ -33,10 +34,12 @@ router = APIRouter()
         },
     },
 )
-async def registration(credentials: Annotated[AuthSchemaBase, Body()]):
+async def registration(
+    credentials: Annotated[AuthSchemaBase, Body()],
+    db: AsyncSession = Depends(get_db)
+):
     try:
-        async with async_db_session.begin() as db:
-            created_user = await UserService().registration(credentials, db)
+        created_user = await UserService().registration(credentials, db)
     except HTTPException as e:
         return await response_base.fail(
             res=CustomResponseCode.HTTP_400,
@@ -55,10 +58,12 @@ async def registration(credentials: Annotated[AuthSchemaBase, Body()]):
     summary="Login",
     description="Enter login credentials and return access token",
 )
-async def login(credentials: Annotated[AuthLoginSchema, Body()]):
+async def login(
+    credentials: Annotated[AuthLoginSchema, Body()],
+    db: AsyncSession = Depends(get_db)
+):
     try:
-        async with async_db_session.begin() as db:
-            result = await UserService().login(credentials, db)
+        result = await UserService().login(credentials, db)
         return await response_base.success(
         res=CustomResponseCode.HTTP_200,
         data=result
@@ -76,14 +81,16 @@ async def login(credentials: Annotated[AuthLoginSchema, Body()]):
     description="Return model of current user",
     dependencies=[Depends(JWTBearer())],
 )
-async def me(request: Request):
+async def me(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
     try:
-        async with async_db_session.begin() as db:
-            user = await UserService.me(request.user_id, db)
-            return await response_base.success(
-                res=CustomResponseCode.HTTP_200,
-                data=user
-            )
+        user = await UserService.me(request.user_id, db)
+        return await response_base.success(
+            res=CustomResponseCode.HTTP_200,
+            data=user
+        )
     except HTTPException as e:
         return await response_base.fail(
             res=CustomResponseCode.HTTP_400,

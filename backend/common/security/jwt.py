@@ -26,6 +26,7 @@ async def sign_jwt(user_id: int) -> Dict[str, str]:
 
     token_info = dict()
     token_info["access_token"] = token
+    token_info["token_type"] = 'Bearer'
     token_info["user_id"] = user_id
     token_info["expires"] = timezone.datetime_to_format(timezone.now() + timedelta(seconds=settings.TOKEN_TIME_EXPIRES))
 
