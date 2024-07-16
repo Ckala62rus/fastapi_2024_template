@@ -33,10 +33,31 @@ class AuthSchemaCreatedNewUser(SchemaBase):
     id: int
     email: EmailStr
     username: str
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_time: datetime | None = None
+    updated_time: datetime | None = None
 
 
 class AuthLoginSchema(SchemaBase):
     email: EmailStr
     password: str | None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "email": "admin@mail.ru",
+                    "password": "123123",
+                }
+            ]
+        }
+    }
+
+
+class MeSchema(AuthSchemaCreatedNewUser):
+    is_superuser: bool
+    is_staff: bool
+
+    # Для того, что бы можно было перегонять данные из модели
+    # MeSchema(**user)
+    class Config:
+        orm_mode = True

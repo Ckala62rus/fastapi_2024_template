@@ -3,7 +3,12 @@ from http.client import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.user.schemas import AuthSchemaBase, AuthSchemaCreatedNewUser, AuthLoginSchema
+from api.user.schemas import (
+    AuthSchemaBase,
+    AuthSchemaCreatedNewUser,
+    AuthLoginSchema,
+    MeSchema
+)
 from common.security.jwt import get_hash_password, password_verify, sign_jwt
 from models.user import User
 
@@ -64,3 +69,22 @@ class UserService:
             raise HTTPException("Incorrect password")
 
         return await sign_jwt(user.id)
+
+    @staticmethod
+    async def get_user_by_id(
+            user_id: int,
+            db: AsyncSession
+    ) -> User | None:
+        query = select(User).where(User.id == user_id)
+        result = await db.execute(query)
+        user = result.scalar()
+        if user is None:
+            return None
+        return user
+
+    @staticmethod
+    async def me(user_id: int, db: AsyncSession) -> MeSchema:
+        user = await UserService.get_user_by_id(user_id, db)
+        if user is None:
+            raise HTTPException(f"User with id {user_id} not found")
+        return MeSchema(**user.__dict__)
