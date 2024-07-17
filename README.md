@@ -79,3 +79,18 @@ alembic downgrade -1 (удаление всех миграций)
 ```Bash
 pytest -vs --disable-warnings
 ```
+
+
+#### Celery
+
+
+```Bash
+# Scheduled tasks (optional)
+celery -A backend.task.celery beat -l info
+
+# Scheduled tasks (optional). Show result in console. Use ONLY DEVELOPER!
+celery -A backend.task.celery worker -l info -B
+
+# Web monitor (optional)
+celery -A task.celery flower --port=8555 --basic-auth=admin:123456
+```

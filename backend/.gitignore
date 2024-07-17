@@ -11,3 +11,4 @@ static/media/
 .pdm-python
 celerybeat-schedule.*
 .idea/
+celerybeat-schedule
