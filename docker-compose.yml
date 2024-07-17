@@ -9,7 +9,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
     env_file:
       - ./backend/.env
 
@@ -20,7 +20,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./docker/postgres:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     env_file:
       - ./backend/.env
 
@@ -35,3 +35,36 @@ services:
       - ./docker/pgadmin:/var/lib/pgadmin
     depends_on:
       - db
+
+  fba_redis:
+    image: redis:6.2.7
+    ports:
+      - "6379:6379"
+    container_name: fba_redis
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - fba_redis:/var/lib/redis
+
+  celery_monitor:
+    build:
+      context: .
+      dockerfile: ./docker/fastapi/DockerFile
+    ports:
+      - "8555:8555"
+    container_name: celery_monitor
+#    restart: always
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - fba_redis
+      - db
+
+volumes:
+  pgdata:
+    name: pgdata
+  fba_redis:
+    name: fba_redis
