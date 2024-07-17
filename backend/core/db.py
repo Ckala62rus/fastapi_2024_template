@@ -11,6 +11,7 @@ from core.config import settings
 
 Base = declarative_base()
 
+
 def create_engine_and_session(url: str | URL):
     try:
         # Core database
@@ -23,7 +24,9 @@ def create_engine_and_session(url: str | URL):
         db_session = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
         return engine, db_session
 
+
 async_engine, async_db_session = create_engine_and_session(settings.SQLALCHEMY_DATABASE_URL)
+
 
 async def get_db() -> AsyncSession:
     """session generator"""
@@ -35,6 +38,7 @@ async def get_db() -> AsyncSession:
         raise se
     finally:
         await session.close()
+
 
 # Session Annotated
 CurrentSession = Annotated[AsyncSession, Depends(get_db)]

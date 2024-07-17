@@ -1,9 +1,10 @@
+from httpx import AsyncClient
 from starlette.testclient import TestClient
 
 from core.config import settings
 
 
-def get_token_headers(client: TestClient, email: str, password: str) -> dict[str, str]:
+def get_token_headers(client: AsyncClient, email: str, password: str) -> dict[str, str]:
     data = {
         'email': email,
         'password': password,
