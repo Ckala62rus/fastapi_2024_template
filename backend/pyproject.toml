@@ -19,6 +19,8 @@ sqlalchemy = "^2.0.31"
 alembic = "^1.13.2"
 psycopg = {extras = ["binary", "pool"], version = "^3.2.1"}
 pytest = "^8.2.2"
+celery = {extras = ["redis"], version = "^5.4.0"}
+flower = "^2.0.1"
 
 
 [build-system]
