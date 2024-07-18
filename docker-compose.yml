@@ -54,6 +54,7 @@ services:
     ports:
       - "8555:8555"
     container_name: celery_monitor
+    command: bash -c "celery -A task.celery flower --port=8555 --basic-auth=admin:123456"
 #    restart: always
     volumes:
       - ./backend:/backend

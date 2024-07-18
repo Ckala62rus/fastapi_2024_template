@@ -23,22 +23,30 @@ http://localhost:8001/api/v1/docs
 
 
 ### Poetry
+```Bash
+# Создание requirements.txt экспорта зависимостей без хэшей
+poetry export --without-hashes -f requirements.txt --output requirements.txt
 
-- Создание requirements.txt экспорта зависимостей без хэшей
-
-> poetry export --without-hashes -f requirements.txt --output requirements.txt
-
-или
-
-> poetry export --without-hashes --format=requirements.txt > requirements.txt
+# или аналогичная команда
+poetry export --without-hashes --format=requirements.txt > requirements.txt
+```
 
 ### Docker
-```
-> (Пересборка контейнера, принудительная) => docker-compose up --build --force-recreate --renew-anon-volumes
-> (Сборка контейнеров) => docker-compose build
-> (Зайти в конкретный контейнер) => docker exec -ti backend_fastapi_2024 bash
-> (Запуск контейнеров в фоне) => docker-compose up -d
-> (Вывести список контейнеров остановленных и работающих) => docker ps -a
+```Bash
+# (Пересборка контейнера, принудительная)
+docker-compose up --build --force-recreate --renew-anon-volumes
+
+# (Сборка контейнеров)
+docker-compose build
+
+# (Зайти в конкретный контейнер)
+docker exec -ti backend_fastapi_2024 bash
+
+# (Запуск контейнеров в фоне)
+docker-compose up -d
+
+# (Вывести список контейнеров остановленных и работающих)
+docker ps -a
 ```
 
 ### Alembic
@@ -88,9 +96,15 @@ pytest -vs --disable-warnings
 # Scheduled tasks (optional)
 celery -A backend.task.celery beat -l info
 
-# Scheduled tasks (optional). Show result in console. Use ONLY DEVELOPER!
+# Run only worker
+celery -A backend.task.celery worker -l info
+
+# Run 'Worker' and 'Beat' Scheduled tasks (optional). Show result in console. Use ONLY DEVELOPER!
 celery -A backend.task.celery worker -l info -B
 
 # Web monitor (optional)
 celery -A task.celery flower --port=8555 --basic-auth=admin:123456
+
+# logout basic auth from celery flower
+http://exit:exit@localhost:8555/
 ```
