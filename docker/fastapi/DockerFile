@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12
 
 WORKDIR /backend
 
@@ -16,6 +16,7 @@ COPY ./backend/poetry.lock /backend/poetry.lock
 
 RUN apt-get update && \
     apt-get install -y mc && \
+    apt-get install -y systemctl && \
     apt-get install -y supervisor && \
     apt-get install -y curl && \
     apt-get install -y bash && \
