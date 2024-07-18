@@ -44,13 +44,13 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL_FOR_ALEMBIC: str = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
 
     # Env Redis
-    # REDIS_HOST: str
-    # REDIS_PORT: int
-    # REDIS_PASSWORD: str
-    # REDIS_DATABASE: int
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
+    REDIS_DATABASE: int
 
     # Redis
-    # REDIS_TIMEOUT: int = 5
+    REDIS_TIMEOUT: int = 5
 
     # FastAPI
     API_V1_STR: str = '/api/v1'
