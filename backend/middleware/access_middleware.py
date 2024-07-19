@@ -18,5 +18,6 @@ class AccessMiddleware(BaseHTTPMiddleware):
             log.info(f'{response.status_code} {request.client.host} {request.method} {request.url} {end_time - start_time}')
             return response
         except Exception as e:
+            log.error(f'{request.client.host} {request.method} {request.url}')
             log.error(traceback.format_exc())
             return Response(status_code=500)
