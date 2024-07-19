@@ -23,8 +23,10 @@ class TaskService:
     def get_status(uid: str):
         try:
             result = AsyncResult(id=uid, app=celery_app)
+            if result.status == 'PENDING':
+                raise NotRegistered('Task not found')
         except NotRegistered:
-            raise NotFoundError(msg='Задача не существует')
+            raise NotFoundError(msg='Task not found')
         return result.status
 
     @staticmethod
