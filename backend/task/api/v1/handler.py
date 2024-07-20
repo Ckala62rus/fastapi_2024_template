@@ -23,6 +23,16 @@ async def get_all_tasks() -> ResponseModel:
 
 
 @router.get(
+    '/current',
+    summary='Получите текущую выполняемую задачу',
+    # dependencies=[Depends(JWTBearer())]
+)
+async def get_current_task() -> ResponseModel:
+    task = task_service.get()
+    return await response_base.success(data=task)
+
+
+@router.get(
     '/{uid}/status',
     summary='Получить статус задачи',
     # dependencies=[Depends(JWTBearer())]
