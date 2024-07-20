@@ -23,6 +23,24 @@ async def get_all_tasks() -> ResponseModel:
 
 
 @router.get(
+    '/{uid}/status',
+    summary='Получить статус задачи',
+    # dependencies=[Depends(JWTBearer())]
+)
+async def get_task_status(
+    uid: Annotated[str, Path(description='Стутус задачи по ID')]
+) -> ResponseModel:
+    try:
+        status = task_service.get_status(uid)
+        return await response_base.success(data=status)
+    except NotFoundError as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data=f"Task with id {uid} not found"
+        )
+
+
+@router.get(
     '/{uid}',
     summary='Получение результатов выполнения задачи',
     # dependencies=[Depends(JWTBearer())]
