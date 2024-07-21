@@ -47,6 +47,9 @@ docker-compose up -d
 
 # (Вывести список контейнеров остановленных и работающих)
 docker ps -a
+
+# Именнные volume (тома) хранятся в windows по пути
+\\wsl$\docker-desktop-data\data\docker\volumes
 ```
 
 ### Alembic
@@ -60,10 +63,10 @@ alembic downgrade -1 (удаление всех миграций)
 ```
 
 ### Todo
-1. Добавить Celery
-2. Фоновые задачи Celery
-3. Celery Flower
-4. Redis
+1. Добавить Celery (+)
+2. Фоновые задачи Celery (+)
+3. Celery Flower (+)
+4. Redis (+)
 5. RabbitMQ
 6. Миграции Alembic (+)
 7. Попробовать пересоздать контейнер на базе Slim
@@ -79,6 +82,7 @@ alembic downgrade -1 (удаление всех миграций)
 - login => postgres
 - password => 123123
 
+```
 
 #### Testing
 
