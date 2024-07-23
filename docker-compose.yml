@@ -73,6 +73,7 @@ services:
 #    command: bash -c "celery -A task.celery flower --port=8555 --basic-auth=admin:123456"
     volumes:
       - ./backend:/backend
+      - ./docker/supervisor/logs:/tmp
     env_file:
       - ./backend/.env
     depends_on:
