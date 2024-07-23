@@ -1,0 +1,61 @@
+FROM python:3.12
+
+WORKDIR /backend
+
+COPY ./backend/requirements.txt /backend/requirements.txt
+COPY ./backend/pyproject.toml /backend/pyproject.toml
+COPY ./backend/poetry.lock /backend/poetry.lock
+
+# RUN apt-get update && apt-get install mc -y
+#
+# RUN apt-get install supervisor -y
+# RUN apt-get install curl -y
+# RUN apt-get install bash -y
+# RUN apt-get install nano -y
+# RUN apt-get install systemd -y
+
+RUN apt-get update && \
+    apt-get install -y mc && \
+    apt-get install -y systemctl && \
+    apt-get install -y supervisor && \
+    apt-get install -y curl && \
+    apt-get install -y bash && \
+    apt-get install -y nano && \
+    apt-get install -y systemd
+
+
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources
+
+# RUN apt-get update \
+#     && apt-get install -y --no-install-recommends gcc python3-dev
+#     \
+#     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+COPY ./backend/pyproject.toml /app/
+COPY ./backend/poetry.lock /app/
+
+RUN pip install poetry && rm -rf /var/cache/apt
+# RUN poetry install --no-dev
+RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
+
+RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
+    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+
+ENV TZ = Europa/Moscow
+
+RUN mkdir -p /var/log/fastapi_server
+
+COPY /docker/supervisor/supervisord.conf /etc/supervisord.conf
+# COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
+
+CMD ["timedatectl", "set-timezone", "Europe/Moscow"]
+
+#CMD ["/usr/bin/supervisord", "-c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
+
+
+#EXPOSE 8002
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]

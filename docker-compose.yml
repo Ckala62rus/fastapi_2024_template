@@ -64,6 +64,21 @@ services:
       - fba_redis
       - db
 
+  supervisor:
+    build:
+      context: .
+      dockerfile: ./docker/supervisor/Dockerfile
+    container_name: supervisor
+    tty: true
+#    command: bash -c "celery -A task.celery flower --port=8555 --basic-auth=admin:123456"
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - fba_redis
+      - db
+
 volumes:
   pgdata:
     name: pgdata

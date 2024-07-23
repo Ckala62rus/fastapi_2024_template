@@ -12,3 +12,4 @@ static/media/
 celerybeat-schedule.*
 .idea/
 celerybeat-schedule
+supervisord.log
