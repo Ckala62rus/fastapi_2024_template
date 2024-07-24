@@ -50,6 +50,7 @@ def init_celery() -> Celery:
         enable_utc=False,
         task_track_started=True,
         beat_schedule=_beat_schedule,
+        broker_connection_retry_on_startup=True
     )
 
     # Load task modules
