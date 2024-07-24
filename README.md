@@ -115,3 +115,10 @@ celery -A task.celery flower --port=8555 --basic-auth=admin:123456
 # logout basic auth from celery flower
 http://exit:exit@localhost:8555/
 ```
+
+#### Mongo
+
+```Bash
+# Connection string for Compas GUI
+mongodb://root:M0ngo100500@localhost:27017/
+```
