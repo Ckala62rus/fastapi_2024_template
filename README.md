@@ -1,5 +1,8 @@
 # FastAPI Template Architecture
 
+### Enviroment variables
+> Создать файл .env из .env.example и поместить в backend директорию
+
 ### Запуск приложения
 > python main.py
 
