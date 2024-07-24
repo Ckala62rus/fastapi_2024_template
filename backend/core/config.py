@@ -90,6 +90,12 @@ class Settings(BaseSettings):
     LOG_STDOUT_FILENAME: str = 'fba_access.log'
     LOG_STDERR_FILENAME: str = 'fba_error.log'
 
+    # Mongo
+    MONGO_USER_API: str = "root"
+    MONGO_PASSWORD_API: str = "M0ngo100500"
+    MONGO_HOST_API: str = "mongo"
+    MONGO_URI: str = f'mongodb://{MONGO_USER_API}:{MONGO_PASSWORD_API}@{MONGO_HOST_API}'
+
 
 # Декоратор lru_cache для хэширования конфига, что бы при следующих обращениях брался его кеш
 @lru_cache
