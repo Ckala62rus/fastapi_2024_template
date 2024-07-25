@@ -168,4 +168,8 @@ pg_dump -U postgres -Fc > ./tmp/backup/db_sql.dump
 
 # Восстановление базы PostgreSQL утилиту pg_dump (restore)
 pg_restore -U postgres -d postgres ./tmp/backup/db_sql.dump
+
+# Бэкап базы одной командой
+# где db_fastapi_2024 контейнер
+docker exec db_fastapi_2024  bash -c "pg_dump -U postgres -Fc > ./tmp/backup/db_sql.dump"
 ```
