@@ -122,3 +122,44 @@ http://exit:exit@localhost:8555/
 # Connection string for Compas GUI
 mongodb://root:M0ngo100500@localhost:27017/
 ```
+
+
+#### Docker backup volumes
+
+```bash
+# Бэкап данных базы Mongo из именованного тома Windows OC
+# где --volumes-from mongo (mongo)
+# путь, куда сохранять наши бэкапы -v %cd%:/backup
+# ubuntu tar cvf ./backup/mongo.tar /data/db архивация данных из монго и сохранение архива по пути ./backup/mongo.tar
+# %cd% для абсолютного пути на Windows а для Linux заменить на $PWD 
+docker run --rm --volumes-from mongo -v %cd%:/backup ubuntu tar cvf ./backup/mongo.tar /data/db
+
+#################
+# Mongo DB
+#################
+
+# Восстановление базы MongoDB из бэкапа архива
+
+# Содание архива данных из MongoDB
+docker run --rm --volumes-from mongo -v %cd%:/backup bash -c "cd /data/db && tar xvf /backup/mongo.tar"
+
+# Восстановление данных из MongoDB
+docker run --rm --volumes-from mongo -v %cd%:/backup bash -c "rm -rf /data/db/* && tar xvf /backup/mongo.tar"
+
+
+#################
+# PostgreSQL
+#################
+
+# Бэкап БД постгреса. Создает архив тома
+docker run --rm --volumes-from db_fastapi_2024 -v %cd%:/backup ubuntu tar cvf ./backup/db.tar /var/lib/postgresql/data
+
+# don't work
+docker run --rm --volumes-from db_fastapi_2024 -v %cd%:/backup bash -c "rm -rf /var/lib/postgresql/data* && tar xvf /backup/db1.tar"
+
+# backup PostgreSql create
+pg_dumpall -c -U postgres > dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql
+
+# backup PostgreSql restore
+cat your_dump.sql | psql -U postgres
+```
