@@ -162,4 +162,10 @@ pg_dumpall -c -U postgres > dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql
 
 # backup PostgreSql restore
 cat your_dump.sql | psql -U postgres
+
+# бэкап PostgreSQL через утилиту pg_dump (делаем бэкап)
+pg_dump -U postgres -Fc > ./tmp/backup/db_sql.dump
+
+# Восстановление базы PostgreSQL утилиту pg_dump (restore)
+pg_restore -U postgres -d postgres ./tmp/backup/db_sql.dump
 ```
