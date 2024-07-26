@@ -147,3 +147,25 @@ async def update_by_id_from_mongo(
         data=entity
     )
 
+
+@router.delete(
+    "/{id}",
+    summary="Удаление данных по id",
+    description="Удаление данных из MongoDB по id"
+)
+async def delete_by_id_from_mongo(
+    id: int,
+    db: MongoDB
+) -> ResponseModel:
+    delete_result = db["users"].delete_one({"_id": id})
+
+    if delete_result.deleted_count == 0:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data=f"Entity with id {id} wasn't deleted"
+        )
+
+    return await response_base.success(
+        res=CustomResponseCode.HTTP_200,
+        data={"message": f"Entity with id {id} was deleted"}
+    )
