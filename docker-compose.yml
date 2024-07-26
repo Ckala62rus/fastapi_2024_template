@@ -91,6 +91,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: M0ngo100500
     volumes:
       - mongo_data:/data/db
+      - ./docker/backup/:/tmp/backup/
 
 volumes:
   pgdata:
