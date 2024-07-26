@@ -147,7 +147,7 @@ docker run --rm --volumes-from mongo -v %cd%:/backup bash -c "cd /data/db && tar
 docker run --rm --volumes-from mongo -v %cd%:/backup bash -c "rm -rf /data/db/* && tar xvf /backup/mongo.tar"
 
 # Создание бэкапа через строку, не заходя в контейнер
-docker exec mongo bash -c "mongodump --db=dev --username=root --password=M0ngo100500 --out=/tmp/backup/mongodump-2011-10-24 --authenticationDatabase=admin"
+docker exec mongo bash -c "mongodump --db=dev --username=root --password=M0ngo100500 --out=/tmp/backup/${1:-`date '+%Y-%d-%m__%H-%M-%S'`} --authenticationDatabase=admin"
 
 # Восстановление бэкапа через строку, не заходя в контейнер
 docker exec mongo bash -c "mongorestore --username=root --password=M0ngo100500 --authenticationDatabase=admin /tmp/backup/mongodump-2011-10-24"

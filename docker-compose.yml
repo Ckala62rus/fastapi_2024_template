@@ -89,6 +89,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: M0ngo100500
+      TZ: Europe/Moscow
     volumes:
       - mongo_data:/data/db
       - ./docker/backup/:/tmp/backup/
