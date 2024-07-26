@@ -1,4 +1,5 @@
 from pathlib import Path
+from random import randint
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Body
@@ -6,6 +7,7 @@ from fastapi import APIRouter, Depends, Body
 from common.exception.errors import NotFoundError
 from common.response.response_chema import ResponseModel, response_base
 from common.response.response_code import CustomResponseCode
+from core.mongo_db import MongoDB
 from middleware.auth_jwt_middleware import JWTBearer
 from task.service.task_service import task_service
 
@@ -73,3 +75,25 @@ async def run_task(
     # task = task_service.run(name=name, args=args, kwargs={"msg": message})
     task = task_service.run(name=name, kwargs={"msg": message})
     return await response_base.success(data=task.task_id)
+
+
+@router.post(
+    '/',
+    summary='Добавить что то в MongoDB',
+    description="Создание записи в MongoDB",
+)
+async def create_in_mongo(db: MongoDB) -> ResponseModel:
+    user = db["users"].insert_one({
+        "_id": randint(1, 1000), # here primary key from Database (PostgresSQL / MySql)
+        "name": "admin",
+        "email": "admin@mail.ru",
+        "password": "<PASSWORD>",
+        "is_active": True,
+    })
+    result = db["users"].find_one(
+        {"_id": user.inserted_id}
+    )
+    return await response_base.success(
+        data=result
+    )
+
