@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Body
 
+from api.mongo.schemas import UpdateDateMongoDBSchema
 from common.exception.errors import NotFoundError
 from common.response.response_chema import ResponseModel, response_base
 from common.response.response_code import CustomResponseCode
@@ -95,5 +96,54 @@ async def create_in_mongo(db: MongoDB) -> ResponseModel:
     )
     return await response_base.success(
         data=result
+    )
+
+
+@router.get(
+    '/{id}',
+    summary='Получить конкретную запись по id из MongoDB',
+    description="Получаем данные из MongoDB в виде коллекции",
+)
+async def get_by_id_from_mongo(id: int, db: MongoDB) -> ResponseModel:
+    user = db["users"].find_one({"_id": id})
+    if user is None:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data=f"Not Found with id {id}"
+        )
+    return await response_base.success(
+        data=user
+    )
+
+
+@router.put(
+    '/{id}',
+    summary='Обновление данных по id MongoDB',
+    description="Обновляем данные в MongoDB и возвращаем результат обновленной модели",
+)
+async def update_by_id_from_mongo(
+    id: int,
+    db: MongoDB,
+    data: UpdateDateMongoDBSchema
+) -> ResponseModel:
+    data_dict = {k: v for k, v in data.dict().items() if v is not None}
+    if len(data_dict) >= 1:
+        update_result = db["users"].update_one(
+            {"_id": id}, {"$set": data_dict}
+        )
+
+        if update_result.modified_count == 0:
+            return await response_base.fail(
+                res=CustomResponseCode.HTTP_200,
+                data=f"Data with id {id} wasn't updated"
+            )
+    entity = db["users"].find_one({"_id": id})
+    if entity is None:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data=f"Not Found with id {id}"
+        )
+    return await response_base.success(
+        data=entity
     )
 
