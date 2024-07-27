@@ -150,7 +150,7 @@ docker run --rm --volumes-from mongo -v %cd%:/backup bash -c "rm -rf /data/db/* 
 docker exec mongo bash -c "mongodump --db=dev --username=root --password=M0ngo100500 --out=/tmp/backup/${1:-`date '+%Y-%d-%m__%H-%M-%S'`} --authenticationDatabase=admin"
 
 # Восстановление бэкапа через строку, не заходя в контейнер
-docker exec mongo bash -c "mongorestore --username=root --password=M0ngo100500 --authenticationDatabase=admin /tmp/backup/mongodump-2011-10-24"
+docker exec mongo bash -c "mongorestore --username=root --password=M0ngo100500 --authenticationDatabase=admin /tmp/backup/2024-26-07__20-47-14"
 
 
 #################
@@ -177,5 +177,8 @@ pg_restore -U postgres -d postgres ./tmp/backup/db_sql.dump
 
 # Бэкап базы одной командой
 # где db_fastapi_2024 контейнер
-docker exec db_fastapi_2024  bash -c "pg_dump -U postgres -Fc > ./tmp/backup/db_sql.dump"
+docker exec db_fastapi_2024  bash -c "pg_dump -U postgres -Fc > ./tmp/backup/${1:-`date '+%Y-%d-%m__%H-%M-%S'`}_backup_sql.dump"
+
+# Восстановление через pg_restore не заходя в контейнер
+docker exec db_fastapi_2024  bash -c "pg_restore -U postgres -d postgres ./tmp/backup/2024-26-07__17-32-50_backup_sql.dump"
 ```

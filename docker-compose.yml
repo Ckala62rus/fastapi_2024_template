@@ -21,7 +21,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./docker/backup/db:/tmp/backup
+      - ./docker/backup/postgres:/tmp/backup
     env_file:
       - ./backend/.env
 
@@ -92,7 +92,7 @@ services:
       TZ: Europe/Moscow
     volumes:
       - mongo_data:/data/db
-      - ./docker/backup/:/tmp/backup/
+      - ./docker/backup/mongo:/tmp/backup
 
 volumes:
   pgdata:
