@@ -95,6 +95,7 @@ class Settings(BaseSettings):
     MONGO_PASSWORD_API: str = "M0ngo100500"
     MONGO_HOST_API: str = "mongo"
     MONGO_URI: str = f'mongodb://{MONGO_USER_API}:{MONGO_PASSWORD_API}@{MONGO_HOST_API}'
+    MONGO_DB: str
 
 
 # Декоратор lru_cache для хэширования конфига, что бы при следующих обращениях брался его кеш
