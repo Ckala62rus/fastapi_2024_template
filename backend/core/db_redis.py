@@ -48,7 +48,7 @@ class RedisCli(Redis):
         :return:
         """
         keys = []
-        async for key in self.scan_iter(match=f'{prefix}*'):
+        for key in self.scan_iter(match=f'{prefix}*'):
             if isinstance(exclude, str):
                 if key != exclude:
                     keys.append(key)
@@ -58,7 +58,7 @@ class RedisCli(Redis):
             else:
                 keys.append(key)
         for key in keys:
-            await self.delete(key)
+            self.delete(key)
 
 
 # Создание redis экземпляра
