@@ -72,9 +72,10 @@ class Settings(BaseSettings):
     STATIC_FILES: bool = False
 
     # Token
-    TOKEN_ALGORITHM: str = 'HS256'  # 算法
-    TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # 过期时间，单位：秒
-    TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # 刷新过期时间，单位：秒
+    TOKEN_ALGORITHM: str = 'HS256'  # алгоритм
+    # TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 1  # Единица измерения в секундах
+    TOKEN_EXPIRE_SECONDS: int = 60 * 2  # Минута
+    TOKEN_REFRESH_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # Время жизни рефреш токена в секундах
     TOKEN_REDIS_PREFIX: str = 'fba_token'
     TOKEN_REFRESH_REDIS_PREFIX: str = 'fba_refresh_token'
     TOKEN_EXCLUDE: list[str] = [  # JWT / RBAC 白名单
