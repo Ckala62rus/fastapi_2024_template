@@ -3,6 +3,9 @@ import time
 from datetime import datetime, timedelta
 from typing import Dict
 
+from fastapi.security.utils import get_authorization_scheme_param
+from starlette.requests import Request
+
 import jwt
 from passlib.context import CryptContext
 
@@ -38,8 +41,11 @@ async def sign_jwt(user_id: int) -> Dict[str, str]:
 async def decode_jwt(token: str) -> dict:
     try:
         decoded_token = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        token_from_redis = redis_client.get(f'{settings.TOKEN_REDIS_PREFIX}:{decoded_token["user_id"]}:{token}')
+        if token_from_redis is None:
+            raise TokenError("Invalid authentication token")
         return decoded_token if decoded_token["expires"] >= time.time() else None
-    except:
+    except Exception as e:
         return {}
 
 
@@ -127,3 +133,16 @@ async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -
     await redis_client.delete(token_key)
     await redis_client.delete(refresh_token_key)
     return new_access_token, new_refresh_token, new_access_token_expire_time, new_refresh_token_expire_time
+
+
+async def get_token(request: Request) -> str:
+    """
+    Get token for request header
+
+    :return:
+    """
+    authorization = request.headers.get('Authorization')
+    scheme, token = get_authorization_scheme_param(authorization)
+    if not authorization or scheme.lower() != 'bearer':
+        raise TokenError(msg='Token incorrect')
+    return token
