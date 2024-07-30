@@ -2,14 +2,22 @@ from http.client import HTTPException
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
 from api.user.schemas import (
     AuthSchemaBase,
     AuthSchemaCreatedNewUser,
     AuthLoginSchema,
-    MeSchema
+    MeSchema, GetLoginToken
 )
-from common.security.jwt import get_hash_password, password_verify, sign_jwt
+from common.security.jwt import (
+    get_hash_password,
+    password_verify,
+    create_access_token_redis,
+    create_refresh_token_redis, get_token
+)
+from core.config import settings
+from core.db_redis import redis_client
 from models.user import User
 
 
@@ -58,7 +66,7 @@ class UserService:
     async def login(
             credentials: AuthLoginSchema,
             db: AsyncSession
-    ) -> dict[str, str]:
+    ) -> GetLoginToken:
         user = await UserService.get_user_by_email(credentials.email, db)
 
         if user is None:
@@ -68,7 +76,26 @@ class UserService:
         if not is_verify_password:
             raise HTTPException("Incorrect password")
 
-        return await sign_jwt(user.id)
+        access_token, access_token_expire_time = await create_access_token_redis(str(user.id))
+        # refresh_token, refresh_token_expire_time = await create_refresh_token_redis(
+        #     str(user.id), access_token_expire_time
+        # )
+        # todo await user_dao.update_login_time(db, obj.username) need create method for last login
+        # todo await db.refresh(current_user)
+        data = GetLoginToken(
+            access_token=access_token,
+            # refresh_token=refresh_token,
+            access_token_expire_time=access_token_expire_time,
+            # refresh_token_expire_time=refresh_token_expire_time,
+        )
+
+        return data
+        # return await sign_jwt(user.id)
+
+    @staticmethod
+    async def logout(*, request: Request) -> None:
+        prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user_id}:'
+        await redis_client.delete_prefix(prefix)
 
     @staticmethod
     async def get_user_by_id(
@@ -88,3 +115,6 @@ class UserService:
         if user is None:
             raise HTTPException(f"User with id {user_id} not found")
         return MeSchema(**user.__dict__)
+
+
+user_service = UserService()
