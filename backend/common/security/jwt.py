@@ -106,7 +106,7 @@ async def create_refresh_token_redis(
     refresh_token: str | None = None
 ) -> tuple[str, str]:
     """
-    Generate encryption refresh token, only used to create a new token
+    Generate refresh token
 
     :param sub: The subject/userid of the JWT
     :param expire_time: expiry time
