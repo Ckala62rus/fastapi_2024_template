@@ -15,13 +15,14 @@ from api.user.schemas import (
     AuthSchemaCreate,
     AuthLoginSchema
 )
-from api.user.service import UserService
+from api.user.service import UserService, user_service
 from common.response.response_chema import response_base
 from common.response.response_code import CustomResponseCode
 from core.db import get_db
 from middleware.auth_jwt_middleware import JWTBearer
 
 router = APIRouter()
+
 
 @router.post(
     "/registration",
@@ -35,8 +36,8 @@ router = APIRouter()
     },
 )
 async def registration(
-    credentials: Annotated[AuthSchemaBase, Body()],
-    db: AsyncSession = Depends(get_db)
+        credentials: Annotated[AuthSchemaBase, Body()],
+        db: AsyncSession = Depends(get_db)
 ):
     try:
         created_user = await UserService().registration(credentials, db)
@@ -59,15 +60,15 @@ async def registration(
     description="Enter login credentials and return access token",
 )
 async def login(
-    credentials: Annotated[AuthLoginSchema, Body()],
-    db: AsyncSession = Depends(get_db)
+        credentials: Annotated[AuthLoginSchema, Body()],
+        db: AsyncSession = Depends(get_db)
 ):
     try:
         result = await UserService().login(credentials, db)
         return await response_base.success(
-        res=CustomResponseCode.HTTP_200,
-        data=result
-    )
+            res=CustomResponseCode.HTTP_200,
+            data=result.model_dump()
+        )
     except HTTPException as e:
         return await response_base.fail(
             res=CustomResponseCode.HTTP_400,
@@ -82,14 +83,34 @@ async def login(
     dependencies=[Depends(JWTBearer())],
 )
 async def me(
-    request: Request,
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        db: AsyncSession = Depends(get_db)
 ):
     try:
         user = await UserService.me(request.user_id, db)
         return await response_base.success(
             res=CustomResponseCode.HTTP_200,
             data=user
+        )
+    except HTTPException as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_400,
+            data=f"Error /login route. {e}"
+        )
+
+
+@router.post(
+    '/logout',
+    summary="Logout",
+    description="Logout",
+    dependencies=[Depends(JWTBearer())],
+)
+async def logout(request: Request):
+    try:
+        await user_service.logout(request=request)
+        return await response_base.success(
+            res=CustomResponseCode.HTTP_200,
+            data={"logout"}
         )
     except HTTPException as e:
         return await response_base.fail(

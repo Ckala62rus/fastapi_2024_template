@@ -23,6 +23,19 @@ class AuthSchemaBase(SchemaBase):
     }
 
 
+class AccessTokenBase(SchemaBase):
+    access_token: str
+    access_token_type: str = 'Bearer'
+    access_token_expire_time: datetime
+
+
+class GetLoginToken(AccessTokenBase):
+    pass
+    # refresh_token: str
+    # refresh_token_type: str = 'Bearer'
+    # refresh_token_expire_time: datetime
+
+
 class AuthSchemaCreate(AuthSchemaBase):
     id: int
     created_at: datetime | None = None
