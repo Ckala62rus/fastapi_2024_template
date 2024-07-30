@@ -38,6 +38,22 @@ async def sign_jwt(user_id: int) -> Dict[str, str]:
     return token_info
 
 
+async def create_jwt_refresh_token(user_id: int) -> Dict[str, str]:
+    payload = {
+        "user_id": user_id,
+        "expires": time.time() + int(settings.TOKEN_REFRESH_EXPIRE_SECONDS)
+    }
+    token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+    token_info = dict()
+    token_info["refresh_token"] = token
+    token_info["token_type"] = 'Bearer'
+    token_info["user_id"] = user_id
+    token_info["expires"] = timezone.datetime_to_format(timezone.now() + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS))
+
+    return token_info
+
+
 async def decode_jwt(token: str) -> dict:
     try:
         decoded_token = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
@@ -84,7 +100,11 @@ async def create_access_token_redis(sub: str, expires_delta: timedelta | None = 
     return token_info["access_token"], token_info["expires"]
 
 
-async def create_refresh_token_redis(sub: str, expire_time: str | None = None, **kwargs) -> tuple[str, datetime]:
+async def create_refresh_token_redis(
+    sub: str,
+    token: str | None = None,
+    refresh_token: str | None = None
+) -> tuple[str, str]:
     """
     Generate encryption refresh token, only used to create a new token
 
@@ -92,26 +112,17 @@ async def create_refresh_token_redis(sub: str, expire_time: str | None = None, *
     :param expire_time: expiry time
     :return:
     """
-    if expire_time:
-        # expire = expire_time + timedelta(seconds=settings.TOKEN_REFRESH_EXPIRE_SECONDS)
-        expire = timezone.datetime_to_format(timezone.now() + timedelta(seconds=settings.TOKEN_TIME_EXPIRES))
-        expire_datetime = timezone.f_datetime(expire_time)
-        current_datetime = timezone.now()
-        if expire_datetime < current_datetime:
-            raise TokenError(msg='Refresh Token недействителен')
-        expire_seconds = int((expire_datetime - current_datetime).total_seconds())
-    else:
-        expire = timezone.now() + timedelta(seconds=settings.TOKEN_EXPIRE_SECONDS)
-        expire_seconds = settings.TOKEN_REFRESH_EXPIRE_SECONDS
-    multi_login = kwargs.pop('multi_login', None)
-    to_encode = {'expires': expire, 'user_id': sub, **kwargs}
-    refresh_token = jwt.encode(to_encode, settings.JWT_SECRET, settings.TOKEN_ALGORITHM)
-    if multi_login is False:
-        prefix = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:'
-        await redis_client.delete_prefix(prefix)
-    key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
-    redis_client.setex(key, expire_seconds, refresh_token)
-    return refresh_token, expire
+    token_info = await create_jwt_refresh_token(user_id=int(sub))
+
+    if refresh_token is not None and token is not None:
+        token_key = f'{settings.TOKEN_REDIS_PREFIX}:{sub}:{token}'
+        refresh_token_key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{refresh_token}'
+        redis_client.delete(token_key)
+        redis_client.delete(refresh_token_key)
+
+    key = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{sub}:{token_info["refresh_token"]}'
+    redis_client.setex(key, settings.TOKEN_REFRESH_EXPIRE_SECONDS, token_info["refresh_token"])
+    return token_info["refresh_token"], token_info["expires"]
 
 
 async def create_new_token(sub: str, token: str, refresh_token: str, **kwargs) -> tuple[str, str, datetime, datetime]:
