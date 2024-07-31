@@ -6,6 +6,7 @@ from fastapi import (
     Body,
     Depends
 )
+from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.requests import Request
@@ -15,8 +16,14 @@ from api.user.schemas import (
     AuthSchemaCreate,
     AuthLoginSchema
 )
-from api.user.service import UserService, user_service
-from common.response.response_chema import response_base
+from api.user.service import (
+    UserService,
+    user_service
+)
+from common.response.response_chema import (
+    response_base,
+    ResponseModel
+)
 from common.response.response_code import CustomResponseCode
 from core.db import get_db
 from middleware.auth_jwt_middleware import JWTBearer
@@ -38,7 +45,7 @@ router = APIRouter()
 async def registration(
         credentials: Annotated[AuthSchemaBase, Body()],
         db: AsyncSession = Depends(get_db)
-):
+) -> ResponseModel:
     try:
         created_user = await UserService().registration(credentials, db)
     except HTTPException as e:
@@ -62,7 +69,7 @@ async def registration(
 async def login(
         credentials: Annotated[AuthLoginSchema, Body()],
         db: AsyncSession = Depends(get_db)
-):
+) -> ResponseModel:
     try:
         result = await UserService().login(credentials, db)
         return await response_base.success(
@@ -85,7 +92,7 @@ async def login(
 async def me(
         request: Request,
         db: AsyncSession = Depends(get_db)
-):
+) -> ResponseModel:
     try:
         user = await UserService.me(request.user_id, db)
         return await response_base.success(
@@ -103,14 +110,38 @@ async def me(
     '/logout',
     summary="Logout",
     description="Logout",
-    dependencies=[Depends(JWTBearer())],
+    # dependencies=[Depends(JWTBearer())],
 )
-async def logout(request: Request):
+async def logout(request: Request) -> ResponseModel:
     try:
         await user_service.logout(request=request)
         return await response_base.success(
             res=CustomResponseCode.HTTP_200,
             data={"logout"}
+        )
+    except HTTPException as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_400,
+            data=f"Error /login route. {e}"
+        )
+
+
+@router.post(
+    '/token/refresh',
+    summary="Refresh",
+    description="Refresh token and return new access_token and refresh token",
+    dependencies=[Depends(JWTBearer())],
+)
+async def token_refresh(
+    request: Request,
+    refresh_token: Annotated[str, Query(...)],
+    db: AsyncSession = Depends(get_db)
+) -> ResponseModel:
+    try:
+        result = await user_service.token_refresh(request=request, refresh_token=refresh_token, db=db)
+        return await response_base.success(
+            res=CustomResponseCode.HTTP_200,
+            data=result.model_dump()
         )
     except HTTPException as e:
         return await response_base.fail(
