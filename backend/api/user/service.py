@@ -8,13 +8,16 @@ from api.user.schemas import (
     AuthSchemaBase,
     AuthSchemaCreatedNewUser,
     AuthLoginSchema,
-    MeSchema, GetLoginToken
+    MeSchema,
+    GetLoginToken,
+    GetNewToken
 )
 from common.security.jwt import (
     get_hash_password,
     password_verify,
     create_access_token_redis,
-    create_refresh_token_redis, get_token
+    create_refresh_token_redis,
+    get_token
 )
 from core.config import settings
 from core.db_redis import redis_client
@@ -77,25 +80,23 @@ class UserService:
             raise HTTPException("Incorrect password")
 
         access_token, access_token_expire_time = await create_access_token_redis(str(user.id))
-        # refresh_token, refresh_token_expire_time = await create_refresh_token_redis(
-        #     str(user.id), access_token_expire_time
-        # )
+        refresh_token, refresh_token_expire_time = await create_refresh_token_redis(str(user.id))
         # todo await user_dao.update_login_time(db, obj.username) need create method for last login
         # todo await db.refresh(current_user)
-        data = GetLoginToken(
+        return GetLoginToken(
             access_token=access_token,
-            # refresh_token=refresh_token,
+            refresh_token=refresh_token,
             access_token_expire_time=access_token_expire_time,
-            # refresh_token_expire_time=refresh_token_expire_time,
+            refresh_token_expire_time=refresh_token_expire_time,
         )
-
-        return data
-        # return await sign_jwt(user.id)
 
     @staticmethod
     async def logout(*, request: Request) -> None:
         prefix = f'{settings.TOKEN_REDIS_PREFIX}:{request.user_id}:'
+        refresh_tokens = f'{settings.TOKEN_REFRESH_REDIS_PREFIX}:{request.user_id}:*'
         await redis_client.delete_prefix(prefix)
+        for key in redis_client.scan_iter(refresh_tokens):
+            redis_client.delete(key)
 
     @staticmethod
     async def get_user_by_id(
@@ -115,6 +116,31 @@ class UserService:
         if user is None:
             raise HTTPException(f"User with id {user_id} not found")
         return MeSchema(**user.__dict__)
+
+    @staticmethod
+    async def token_refresh(
+        *,
+        request: Request,
+        refresh_token: str,
+        db: AsyncSession
+    ) -> GetNewToken:
+        user = await UserService.get_user_by_id(request.user_id, db)
+        old_token = await get_token(request)
+        if user is None:
+            raise HTTPException(f"User with id {request.user_id} not found")
+        new_access_token, new_access_token_expire_time = await create_access_token_redis(str(user.id))
+        new_refresh_token, new_refresh_token_expire_time = await create_refresh_token_redis(
+            str(user.id),
+            old_token,
+            refresh_token
+        )
+        data = GetNewToken(
+            access_token=new_access_token,
+            access_token_expire_time=new_access_token_expire_time,
+            refresh_token=new_refresh_token,
+            refresh_token_expire_time=new_refresh_token_expire_time,
+        )
+        return data
 
 
 user_service = UserService()

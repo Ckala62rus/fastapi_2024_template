@@ -30,10 +30,15 @@ class AccessTokenBase(SchemaBase):
 
 
 class GetLoginToken(AccessTokenBase):
-    pass
-    # refresh_token: str
-    # refresh_token_type: str = 'Bearer'
-    # refresh_token_expire_time: datetime
+    refresh_token: str
+    refresh_token_type: str = 'Bearer'
+    refresh_token_expire_time: datetime
+
+
+class GetNewToken(AccessTokenBase):
+    refresh_token: str
+    refresh_token_type: str = 'Bearer'
+    refresh_token_expire_time: datetime
 
 
 class AuthSchemaCreate(AuthSchemaBase):
