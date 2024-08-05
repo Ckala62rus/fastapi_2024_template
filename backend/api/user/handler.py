@@ -110,7 +110,7 @@ async def me(
     '/logout',
     summary="Logout",
     description="Logout",
-    # dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(JWTBearer())],
 )
 async def logout(request: Request) -> ResponseModel:
     try:
