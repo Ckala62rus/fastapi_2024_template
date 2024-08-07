@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.permission.repository import permission_repository
-from api.permission.schemas import PermissionAllSchema
+from api.permission.schemas import PermissionAllSchema, PermissionCreateSchema
 
 
 class PermissionService:
@@ -15,7 +15,10 @@ class PermissionService:
         db: AsyncSession,
         permission_id: int
     ):
-        pass
+        permission = await permission_repository.get_permission_by_id(permission_id, db)
+        if permission is None:
+            return None
+        return PermissionAllSchema(**permission)
 
     @staticmethod
     async def create_permission(db: AsyncSession):
