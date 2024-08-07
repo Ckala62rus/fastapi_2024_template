@@ -24,12 +24,12 @@ class PermissionAllSchema(SchemaBase):
     permissions: List[Permission]
 
 
-class PermissionCreateSchema(PermissionSchema):
+class PermissionCreateSchema(SchemaBase):
+    name: str
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
                     "name": "some_permission"
                 }
             ]

@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from starlette import status
 
+from api.permission.schemas import PermissionCreateSchema, PermissionAllSchema
 from api.permission.service import PermissionService
 from common.response.response_chema import ResponseModel, response_base
 from common.response.response_code import CustomResponseCode
@@ -49,5 +52,24 @@ async def get_permission_by_id(
         )
     return await response_base.success(
         res=CustomResponseCode.HTTP_200,
+        data=permission
+    )
+
+
+@router.post(
+    '/',
+    summary="Create permission",
+    description="Create permission",
+)
+async def create_permission(
+    permission_create: PermissionCreateSchema,
+    db: AsyncSession = Depends(get_db)
+):
+    permission = await PermissionService.create_permission(
+        permission_create.model_dump(),
+        db
+    )
+    return await response_base.success(
+        res=CustomResponseCode.HTTP_201,
         data=permission
     )
