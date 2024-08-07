@@ -27,8 +27,8 @@ class PermissionRepository:
     """
     @staticmethod
     async def get_permission_by_id(
-        permission_id: int,
-        db: AsyncSession
+            permission_id: int,
+            db: AsyncSession
     ) -> Permission | None:
         query = select(Permission).where(Permission.id == permission_id)
         result = await db.execute(query)
@@ -46,8 +46,8 @@ class PermissionRepository:
     """
     @staticmethod
     async def create_permission(
-        data: dict,
-        db: AsyncSession
+            data: dict,
+            db: AsyncSession
     ) -> Permission:
         permission = Permission(**data)
         db.add(permission)
@@ -58,9 +58,22 @@ class PermissionRepository:
     async def update_permission(permission_id: int, data: dict):
         pass
 
+    """
+    Delete single permission by id
+
+    :param permission_id: int
+    :param db: AsyncSession
+    :return: Bool
+    """
     @staticmethod
-    async def delete_permission(permission_id: int):
-        pass
+    async def delete_permission(permission_id: int, db: AsyncSession) -> bool:
+        stmt = await db.execute(select(Permission).where(Permission.id == permission_id))
+        obj = stmt.scalar()
+        if obj is None:
+            return False
+        await db.delete(obj)
+        await db.commit()
+        return True
 
 
 permission_repository = PermissionRepository()

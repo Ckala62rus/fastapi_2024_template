@@ -2,11 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.permission.repository import permission_repository
 from api.permission.schemas import (
-    PermissionAllSchema,
-    PermissionCreateSchema,
     PermissionSchema
 )
-from models.permission import Permission
 
 
 class PermissionService:
@@ -38,8 +35,8 @@ class PermissionService:
         pass
 
     @staticmethod
-    async def delete_permission(db: AsyncSession):
-        pass
+    async def delete_permission(permission_id: int, db: AsyncSession) -> bool:
+        return await permission_repository.delete_permission(permission_id, db)
 
 
 permission_service = PermissionService()
