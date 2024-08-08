@@ -79,3 +79,8 @@ class MeSchema(AuthSchemaCreatedNewUser):
     # MeSchema(**user)
     class Config:
         orm_mode = True
+
+
+class PaginationSchema(SchemaBase):
+    page: int = 1
+    limit: int = 10

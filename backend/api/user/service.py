@@ -2,6 +2,7 @@ from http.client import HTTPException
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from api.user.schemas import (
@@ -66,6 +67,22 @@ class UserService:
         return user
 
     @staticmethod
+    async def get_all_users(
+            db: AsyncSession,
+            limit: int = 10,
+            page: int = 1,
+    ):
+        skip = (page - 1) * limit
+        query = (
+            select(User)
+            .order_by(User.id.desc())
+            .options(selectinload(User.permissions))
+        ).limit(limit).offset(skip)
+        result = await db.execute(query)
+        users = result.scalars().all()
+        return users
+
+    @staticmethod
     async def login(
             credentials: AuthLoginSchema,
             db: AsyncSession
@@ -103,7 +120,11 @@ class UserService:
             user_id: int,
             db: AsyncSession
     ) -> User | None:
-        query = select(User).where(User.id == user_id)
+        query = (
+            select(User)
+            .where(User.id == user_id).
+            options(selectinload(User.permissions))
+        )
         result = await db.execute(query)
         user = result.scalar()
         if user is None:
@@ -119,10 +140,10 @@ class UserService:
 
     @staticmethod
     async def token_refresh(
-        *,
-        request: Request,
-        refresh_token: str,
-        db: AsyncSession
+            *,
+            request: Request,
+            refresh_token: str,
+            db: AsyncSession
     ) -> GetNewToken:
         user = await UserService.get_user_by_id(request.user_id, db)
         old_token = await get_token(request)
