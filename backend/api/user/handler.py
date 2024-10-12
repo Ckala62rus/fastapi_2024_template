@@ -27,7 +27,7 @@ from common.response.response_chema import (
 )
 from common.response.response_code import CustomResponseCode
 from core.db import get_db
-from middleware.PermissionChecker import PermissionChecker
+# from middleware.PermissionChecker import PermissionChecker
 from middleware.auth_jwt_middleware import JWTBearer
 
 router = APIRouter()
@@ -97,7 +97,7 @@ async def login(
 async def me(
         request: Request,
         db: AsyncSession = Depends(get_db),
-        authorize: bool = Depends(PermissionChecker(required_permissions=['items:read', ]))
+        # authorize: bool = Depends(PermissionChecker(required_permissions=['items:read', ]))
 ) -> ResponseModel:
     try:
         user = await UserService.me(request.user_id, db)
