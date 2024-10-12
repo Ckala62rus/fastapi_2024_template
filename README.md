@@ -28,7 +28,7 @@ http://localhost:8001/api/v1/docs
 ### Poetry
 ```Bash
 # Создание requirements.txt экспорта зависимостей без хэшей
-poetry export --without-hashes -f requirements.txt --output requirements.txt
+poetry export --without-hashes -f requirements.txt --output requirements.txt  
 
 # или аналогичная команда
 poetry export --without-hashes --format=requirements.txt > requirements.txt
