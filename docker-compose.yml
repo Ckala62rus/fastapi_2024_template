@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   backend_fastapi_2024:
+    image: ckala62rus/fastapi_architecture_2024
     container_name: backend_fastapi_2024
     build:
       context: .
