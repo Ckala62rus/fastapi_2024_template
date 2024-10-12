@@ -14,7 +14,8 @@ from starlette.requests import Request
 from api.user.schemas import (
     AuthSchemaBase,
     AuthSchemaCreate,
-    AuthLoginSchema
+    AuthLoginSchema,
+    PaginationSchema,
 )
 from api.user.service import (
     UserService,
@@ -26,6 +27,7 @@ from common.response.response_chema import (
 )
 from common.response.response_code import CustomResponseCode
 from core.db import get_db
+from middleware.PermissionChecker import PermissionChecker
 from middleware.auth_jwt_middleware import JWTBearer
 
 router = APIRouter()
@@ -87,11 +89,15 @@ async def login(
     '/me',
     summary="Me",
     description="Return model of current user",
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[
+        Depends(JWTBearer()),
+        # Depends(PermissionChecker([]))
+    ],
 )
 async def me(
         request: Request,
-        db: AsyncSession = Depends(get_db)
+        db: AsyncSession = Depends(get_db),
+        authorize: bool = Depends(PermissionChecker(required_permissions=['items:read', ]))
 ) -> ResponseModel:
     try:
         user = await UserService.me(request.user_id, db)
@@ -110,7 +116,7 @@ async def me(
     '/logout',
     summary="Logout",
     description="Logout",
-    # dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(JWTBearer())],
 )
 async def logout(request: Request) -> ResponseModel:
     try:
@@ -133,9 +139,9 @@ async def logout(request: Request) -> ResponseModel:
     dependencies=[Depends(JWTBearer())],
 )
 async def token_refresh(
-    request: Request,
-    refresh_token: Annotated[str, Query(...)],
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        refresh_token: Annotated[str, Query(...)],
+        db: AsyncSession = Depends(get_db)
 ) -> ResponseModel:
     try:
         result = await user_service.token_refresh(request=request, refresh_token=refresh_token, db=db)
@@ -148,3 +154,23 @@ async def token_refresh(
             res=CustomResponseCode.HTTP_400,
             data=f"Error /login route. {e}"
         )
+
+
+@router.get(
+    '/users',
+    summary="Users",
+    description="Return all users",
+)
+async def get_all_users(
+    pagination: PaginationSchema = Depends(),
+    db: AsyncSession = Depends(get_db)
+) -> ResponseModel:
+    users = await UserService().get_all_users(
+        db,
+        pagination.limit,
+        pagination.page,
+    )
+    return await response_base.success(
+        res=CustomResponseCode.HTTP_200,
+        data=users
+    )
