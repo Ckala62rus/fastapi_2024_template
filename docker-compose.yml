@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: ./docker/fastapi/DockerFile
 #    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+#    tty: true
     ports:
       - "8001:8001"
     volumes:

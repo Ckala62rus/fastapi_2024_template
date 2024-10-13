@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12 as builder
 
 WORKDIR /backend
 
@@ -50,8 +50,52 @@ RUN mkdir -p /var/log/fastapi_server
 
 # COPY deploy/backend/fastapi_server.conf /etc/supervisor/conf.d/
 
+# CMD ["timedatectl", "set-timezone" "Europe/Moscow"]
+#
+# EXPOSE 8001
+#
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+
+##################################
+# Build
+##################################
+FROM python:3.12-alpine
+
+
+WORKDIR /backend
+
+COPY --from=builder /backend /backend
+
+RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
+    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+
+
 CMD ["timedatectl", "set-timezone" "Europe/Moscow"]
-
 EXPOSE 8001
-
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+
+
+# LABEL authors="Ckala"
+# WORKDIR /src
+#
+# ADD src/ /src/
+#
+# ENV CGO_ENABLED=0
+#
+# RUN apk update
+# RUN apk add gcompat curl
+#
+# RUN cd /src go mod tidy
+#
+#
+# CMD ["dos2unix", "bootstrap_worker.sh"]
+#
+# RUN go build -o worker ./worker/worker.go
+# RUN chmod 777 ./worker/worker
+#
+# FROM alpine:3.14
+#
+# WORKDIR /src
+#
+# COPY --from=builder /src /src
+# CMD ["./worker/worker"]
