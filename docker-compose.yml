@@ -52,10 +52,10 @@ services:
 
   celery_monitor:
     container_name: celery_monitor
-    image: ckala62rus/fastapi_architecture_2024
+    image: ckala62rus/celery_monitor_fastapi_architecture_2024
     build:
       context: .
-      dockerfile: ./docker/fastapi/DockerFile
+      dockerfile: ./docker/celery_monitor/DockerFile
     ports:
       - "8555:8555"
     command: sh -c "celery -A task.celery flower --port=8555 --basic-auth=admin:123456"
