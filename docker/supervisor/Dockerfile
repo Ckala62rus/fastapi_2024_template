@@ -6,14 +6,24 @@ COPY ./backend/requirements.txt /backend/requirements.txt
 COPY ./backend/pyproject.toml /backend/pyproject.toml
 COPY ./backend/poetry.lock /backend/poetry.lock
 
-RUN apt-get update && \
-    apt-get install -y mc && \
-    apt-get install -y systemctl && \
-    apt-get install -y supervisor && \
-    apt-get install -y curl && \
-    apt-get install -y bash && \
-    apt-get install -y nano && \
-    apt-get install -y systemd
+#RUN apt-get update && \
+#    apt-get install -y mc && \
+#    apt-get install -y systemctl && \
+#    apt-get install -y supervisor && \
+#    apt-get install -y curl && \
+#    apt-get install -y bash && \
+#    apt-get install -y nano && \
+#    apt-get install -y systemd
+
+RUN apt-get update && apt-get install -y \
+    mc \
+    supervisor \
+    curl \
+    bash \
+    nano \
+    systemd \
+    && apt-get install -y systemctl \
+    && rm -rf /var/lib/apt/lists/*
 
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \

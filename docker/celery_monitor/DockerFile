@@ -23,35 +23,25 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debi
     && pip install poetry && rm -rf /var/cache/apt \
     && poetry export --without-hashes -f requirements.txt --output requirements.txt \
     && pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple \
+    && mkdir -p /var/log/fastapi_server
 
-# RUN curl -sSL https://install.python-poetry.org | python3 -
+# RUN mkdir -p /var/log/fastapi_server
 
-# RUN pip install poetry && rm -rf /var/cache/apt
+# CMD ["timedatectl", "set-timezone" "Europe/Moscow"]
+# EXPOSE 8001
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
 
-# RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
+#################################
+# Build
+#################################
+FROM python:3.12-alpine
 
-# RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-#     && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
-
-# ENV TZ = Europa/Moscow
-
-RUN mkdir -p /var/log/fastapi_server
+WORKDIR /backend
 
 CMD ["timedatectl", "set-timezone" "Europe/Moscow"]
-EXPOSE 8001
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
 
-##################################
-# Build
-##################################
-# FROM python:3.12-alpine
-#
-#
-# WORKDIR /backend
-#
-# COPY --from=builder /backend /backend
-#
-# RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
-#     && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+COPY --from=builder /backend /backend
 
+RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
+    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
