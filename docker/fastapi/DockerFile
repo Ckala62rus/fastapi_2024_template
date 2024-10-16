@@ -2,9 +2,9 @@ FROM python:3.12 as builder
 
 WORKDIR /backend
 
-COPY ./backend/requirements.txt /backend/requirements.txt
-COPY ./backend/pyproject.toml /backend/pyproject.toml
-COPY ./backend/poetry.lock /backend/poetry.lock
+COPY ./backend/requirements.txt \
+    ./backend/pyproject.toml \
+    ./backend/poetry.lock /backend/
 
 RUN apt-get update && apt-get install -y \
     mc \
