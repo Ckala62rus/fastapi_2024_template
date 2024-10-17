@@ -69,6 +69,7 @@ services:
       - db
 
   supervisor:
+    image: ckala62rus/supervisor_fastapi_architecture_2024:1.0.0
     build:
       context: .
       dockerfile: ./docker/supervisor/Dockerfile

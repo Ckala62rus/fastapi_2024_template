@@ -2,18 +2,9 @@ FROM python:3.12
 
 WORKDIR /backend
 
-COPY ./backend/requirements.txt /backend/requirements.txt
-COPY ./backend/pyproject.toml /backend/pyproject.toml
-COPY ./backend/poetry.lock /backend/poetry.lock
-
-#RUN apt-get update && \
-#    apt-get install -y mc && \
-#    apt-get install -y systemctl && \
-#    apt-get install -y supervisor && \
-#    apt-get install -y curl && \
-#    apt-get install -y bash && \
-#    apt-get install -y nano && \
-#    apt-get install -y systemd
+COPY ./backend/requirements.txt \
+    ./backend/pyproject.toml \
+    ./backend/poetry.lock /backend/
 
 RUN apt-get update && apt-get install -y \
     mc \
@@ -27,23 +18,29 @@ RUN apt-get update && apt-get install -y \
 
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
-    && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources
-
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-COPY ./backend/pyproject.toml /app/
-COPY ./backend/poetry.lock /app/
-
-RUN pip install poetry && rm -rf /var/cache/apt
-
-RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
-
-RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
+    && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources \
+    && curl -sSL https://install.python-poetry.org | python3 - \
+    && pip install poetry \
+    && rm -rf /var/cache/apt \
+    && poetry export --without-hashes -f requirements.txt --output requirements.txt \
+    && pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
     && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+
+#RUN curl -sSL https://install.python-poetry.org | python3 -
+
+#COPY ./backend/pyproject.toml /app/
+#COPY ./backend/poetry.lock /app/
+
+#RUN pip install poetry && rm -rf /var/cache/apt
+
+#RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
+
+#RUN pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple \
+#    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
 ENV TZ = Europa/Moscow
 
-RUN mkdir -p /var/log/fastapi_server
+#RUN mkdir -p /var/log/fastapi_server
 
 COPY /docker/supervisor/supervisord.conf /etc/supervisord.conf
 
