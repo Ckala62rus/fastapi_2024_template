@@ -23,9 +23,21 @@ jobs:
           push: true
           tags: ckala62rus/fastapi_architecture_2024:latest
 
-      - name: Publish to Registry ( go-template-worker )
+      - name: Publish to Registry ( celery_monitor_fastapi_architecture_2024 )
         uses: docker/build-push-action@v4
         with:
           file: ./docker/celery_monitor/DockerFile
           push: true
           tags: ckala62rus/celery_monitor_fastapi_architecture_2024:latest
+
+  build_supervisor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Publish to Registry ( supervisor_fastapi_architecture_2024 )
+        uses: docker/build-push-action@v4
+        with:
+          file: ./docker/supervisor/DockerFile
+          push: true
+          tags: ckala62rus/supervisor_fastapi_architecture_2024
