@@ -37,7 +37,7 @@ poetry export --without-hashes --format=requirements.txt > requirements.txt
 ### Docker
 ```Bash
 # (Пересборка контейнера, принудительная)
-docker-compose up --build --force-recreate --renew-anon-volumes
+docker-compose up --build --force-recreate --renew-anon-volumes --no-cache
 
 # (Сборка контейнеров)
 docker-compose build
