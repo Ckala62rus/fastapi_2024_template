@@ -36,6 +36,13 @@ poetry export --without-hashes --format=requirements.txt > requirements.txt
 
 ### Docker
 ```Bash
+
+# Полная пересборка контейнеров со скачиванием всех зависимостей (самый лучший вариант)
+docker compose build --no-cache
+
+# Полная пересборка конкретного контейнера
+docker compose build --no-cache my_container
+
 # (Пересборка контейнера, принудительная)
 docker-compose up --build --force-recreate --renew-anon-volumes --no-cache
 
