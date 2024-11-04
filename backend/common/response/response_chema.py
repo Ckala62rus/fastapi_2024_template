@@ -83,7 +83,7 @@ class ResponseBase:
         data: Any | None = None,
     ) -> Response:
         """
-        .. warning::
+        warning::
         :param res:
         :param data:
         :return:
