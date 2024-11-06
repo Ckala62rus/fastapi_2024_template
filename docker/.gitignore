@@ -2,3 +2,4 @@ pgadmin
 postgres
 /supervisor/logs
 db
+minio_data
