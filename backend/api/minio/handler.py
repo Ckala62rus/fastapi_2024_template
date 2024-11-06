@@ -39,8 +39,8 @@ async def hello_world(
 ) -> Response:
     minio_client = Minio(
         'minio:9000',
-        access_key='5Q7tQ5Gd2ZF1iyDRKtI7',
-        secret_key='8jkdt6qj1i4knAp7818w0ZbAVuCK3pkv4yFWxNnz',
+        access_key='9BiPgbQ1nlaYPRLwCwBk',
+        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
         secure=False
     )
 
@@ -58,7 +58,7 @@ async def hello_world(
 @router.get(
     "/files",
     summary="get files",
-    description="gett files from bucket",
+    description="get files from bucket",
     responses={
         status.HTTP_200_OK: {
             "model": FilesSchema, # custom pydantic model for 200 response
@@ -71,8 +71,8 @@ async def files(
 ) -> Response:
     minio_client = Minio(
         'minio:9000',
-        access_key='5Q7tQ5Gd2ZF1iyDRKtI7',
-        secret_key='8jkdt6qj1i4knAp7818w0ZbAVuCK3pkv4yFWxNnz',
+        access_key='9BiPgbQ1nlaYPRLwCwBk',
+        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
         secure=False
     )
 
@@ -111,8 +111,8 @@ async def files(
 async def file(file: UploadFile = File(...)) -> ResponseModel:
     minio_client = Minio(
         'minio:9000',
-        access_key='5Q7tQ5Gd2ZF1iyDRKtI7',
-        secret_key='8jkdt6qj1i4knAp7818w0ZbAVuCK3pkv4yFWxNnz',
+        access_key='9BiPgbQ1nlaYPRLwCwBk',
+        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
         secure=False
     )
 
@@ -128,6 +128,47 @@ async def file(file: UploadFile = File(...)) -> ResponseModel:
     file_name = f"{uuid_filename}.{extension}"
     # ret = minio_client.put_object('images', file.filename, file.file, file_size, content_type='image/jpeg')
     ret = minio_client.put_object('images', file_name, file.file, file_size, content_type='image/jpeg')
+
+    return await response_base.success(
+        data={
+            'status' : 'success',
+            'data': {
+                'file': f'http://127.0.0.1:9000/{ret.bucket_name}/{ret.object_name}'
+            }
+        }
+    )
+
+
+@router.post(
+    "/videos",
+    summary="upload video file",
+    description="upload video file and return link on it",
+    responses={
+        status.HTTP_200_OK: {
+            "model": ResponseModel, # custom pydantic model for 200 response
+            "description": "Ok Response",
+        },
+    },
+)
+async def video_file_upload(video: UploadFile = File(...)) -> ResponseModel:
+    minio_client = Minio(
+        'minio:9000',
+        access_key='9BiPgbQ1nlaYPRLwCwBk',
+        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
+        secure=False
+    )
+
+    # if not allowed_file(file.filename):
+    #     raise response_base.fail(
+    #         status_code=400,
+    #         detail="Invalid file extension. Allowed extensions are txt, pdf, png, jpg, jpeg, gif."
+    #     )
+
+    file_size = os.fstat(video.file.fileno()).st_size
+    extension = video.filename.rsplit('.', 1)[1].lower()
+    uuid_filename = str(uuid.uuid4())
+    file_name = f"{uuid_filename}.{extension}"
+    ret = minio_client.put_object('video', file_name, video.file, file_size, content_type='video/mp4')
 
     return await response_base.success(
         data={
