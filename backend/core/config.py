@@ -98,6 +98,12 @@ class Settings(BaseSettings):
     MONGO_URI: str = f'mongodb://{MONGO_USER_API}:{MONGO_PASSWORD_API}@{MONGO_HOST_API}'
     MONGO_DB: str
 
+    # Minio
+    MINIO_HOST: str = 'minio:9000' # http://localhost:9000
+    MINIO_ACCESS_KEY: str = ''
+    MINIO_SECRET_KEY: str = ''
+    SECURE: bool = False
+
 
 # Декоратор lru_cache для хэширования конфига, что бы при следующих обращениях брался его кеш
 @lru_cache
