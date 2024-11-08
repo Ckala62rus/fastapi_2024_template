@@ -11,6 +11,10 @@ class FileBase(SchemaBase):
     bucket: str
 
 
+class Bucket(SchemaBase):
+    bucket: str | None = None
+
+
 class FileUrl(FileBase):
     model_config = {
         "json_schema_extra": {
