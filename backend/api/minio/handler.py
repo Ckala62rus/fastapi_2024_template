@@ -1,17 +1,30 @@
 import os
 import uuid
-from io import BytesIO
-from typing import Any
 
-import fastapi
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    Depends
+)
 from starlette import status
 from starlette.requests import Request
-from minio import Minio
-from starlette.responses import StreamingResponse, Response
+from minio import (
+    Minio,
+    S3Error
+)
+from starlette.responses import Response
 
-from api.minio.schemas import GetFile, FilesSchema
-from common.response.response_chema import ResponseModel, response_base
+from api.minio.schemas import (
+    GetFile,
+    FilesSchema,
+    Bucket
+)
+from api.minio.service import MinioService
+from common.response.response_chema import (
+    ResponseModel,
+    response_base
+)
 from common.response.response_code import CustomResponseCode
 
 router = APIRouter()
@@ -26,33 +39,23 @@ def allowed_file(filename):
     "/file",
     summary="get file",
     description="return link to file",
-    # responses={
-    #     status.HTTP_200_OK: {
-    #         "model": ResponseModel, # custom pydantic model for 200 response
-    #         "description": "Ok Response",
-    #     },
-    # },
 )
-async def hello_world(
-    request: Request,
+async def file(
     file: GetFile = Depends(),
 ) -> Response:
-    minio_client = Minio(
-        'minio:9000',
-        access_key='9BiPgbQ1nlaYPRLwCwBk',
-        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
-        secure=False
-    )
 
-    # response = minio_client.get_object('images', file.file)
-    # return StreamingResponse(BytesIO(response.read()))
-
+    minio_service = MinioService()
     try:
-        response = minio_client.get_object('images', file.file)
-        return StreamingResponse(BytesIO(response.read()))
-    except Exception as e:
-        return StreamingResponse(status_code=404, content="")
-        # return await response_base.fail(res=CustomResponseCode.HTTP_404)
+        return await minio_service.get_file_url(file.bucket, file.file)
+    except S3Error as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "image": file.file,
+                "message": e.message,
+                "code": e.code
+            }
+        )
 
 
 @router.get(
@@ -69,31 +72,20 @@ async def hello_world(
 async def files(
     request: Request,
 ) -> Response:
-    minio_client = Minio(
-        'minio:9000',
-        access_key='9BiPgbQ1nlaYPRLwCwBk',
-        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
-        secure=False
-    )
-
-    files = []
-
-    buckets = minio_client.list_buckets()
-    for bucket in buckets:
-        # print(bucket.name, bucket.creation_date)
-        # List objects information.
-        objects = minio_client.list_objects(bucket.name)
-        for obj in objects:
-            print(obj.object_name)
-            files.append(f"{bucket}/{obj.object_name}")
-
-    files_schema = FilesSchema()
-    files_schema.urls = files
+    try:
+        minio_service = MinioService()
+        files = await minio_service.get_files_from_bucket('images')
+        files_schema = FilesSchema().urls = files
+    except Exception as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "message": e.detail,
+            }
+        )
 
     return await response_base.success(
-        # data={"files": files_schema}
         data=files_schema
-        # data={"files": "one"}
     )
 
 
@@ -108,35 +100,38 @@ async def files(
         },
     },
 )
-async def file(file: UploadFile = File(...)) -> ResponseModel:
-    minio_client = Minio(
-        'minio:9000',
-        access_key='9BiPgbQ1nlaYPRLwCwBk',
-        secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
-        secure=False
-    )
-
+async def file(
+    file: UploadFile = File(...),
+    bucket: Bucket = Depends()
+) -> ResponseModel:
     if not allowed_file(file.filename):
-        raise response_base.fail(
-            status_code=400,
-            detail="Invalid file extension. Allowed extensions are txt, pdf, png, jpg, jpeg, gif."
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "message": "Invalid file extension. Allowed extensions are txt, pdf, png, jpg, jpeg, gif."
+            }
         )
 
-    file_size = os.fstat(file.file.fileno()).st_size
-    extension = file.filename.rsplit('.', 1)[1].lower()
-    uuid_filename = str(uuid.uuid4())
-    file_name = f"{uuid_filename}.{extension}"
-    # ret = minio_client.put_object('images', file.filename, file.file, file_size, content_type='image/jpeg')
-    ret = minio_client.put_object('images', file_name, file.file, file_size, content_type='image/jpeg')
-
-    return await response_base.success(
-        data={
-            'status' : 'success',
-            'data': {
-                'file': f'http://127.0.0.1:9000/{ret.bucket_name}/{ret.object_name}'
+    minio_service = MinioService()
+    try:
+        response_file = await minio_service.save_file(bucket.bucket, file)
+        return await response_base.success(
+            data={
+                'status': 'success',
+                'data': {
+                    'file': f'http://127.0.0.1:9000/{response_file.bucket_name}/{response_file.object_name}'
+                }
             }
-        }
-    )
+        )
+    except S3Error as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "image": file.file,
+                "message": e.message,
+                "code": e.code
+            }
+        )
 
 
 @router.post(
@@ -157,12 +152,6 @@ async def video_file_upload(video: UploadFile = File(...)) -> ResponseModel:
         secret_key='J5ECRM34lASo7ztaEwfwkilqG8oZkMeUuuT8VLRw',
         secure=False
     )
-
-    # if not allowed_file(file.filename):
-    #     raise response_base.fail(
-    #         status_code=400,
-    #         detail="Invalid file extension. Allowed extensions are txt, pdf, png, jpg, jpeg, gif."
-    #     )
 
     file_size = os.fstat(video.file.fileno()).st_size
     extension = video.filename.rsplit('.', 1)[1].lower()
