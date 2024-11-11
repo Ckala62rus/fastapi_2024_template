@@ -56,7 +56,7 @@ class MinioService:
     async def get_files_from_bucket(self, bucket_name: str) -> list:
         try:
             files = []
-            objects = minio_client().list_objects(bucket_name)
+            objects = minio_client().list_objects(bucket_name, recursive=True)
             for obj in objects:
                 files.append(f"{bucket_name}/{obj.object_name}")
             return files
