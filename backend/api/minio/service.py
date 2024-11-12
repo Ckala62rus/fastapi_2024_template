@@ -39,11 +39,19 @@ class MinioService:
                 response.close()
                 response.release_conn()
 
-    async def save_file(self, bucket_name: str, file: UploadFile)-> ObjectWriteResult:
+    async def save_file(
+        self,
+        bucket_name: str,
+        file: UploadFile,
+        nested_path: str = None,
+    )-> ObjectWriteResult:
         file_size = os.fstat(file.file.fileno()).st_size
         extension = file.filename.rsplit('.', 1)[1].lower()
         uuid_filename = str(uuid.uuid4())
         file_name = f"{uuid_filename}.{extension}"
+
+        if nested_path:
+            file_name = nested_path + '/' + file_name
 
         return minio_client().put_object(
             bucket_name,
