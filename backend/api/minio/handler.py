@@ -70,11 +70,11 @@ async def file(
     },
 )
 async def files(
-    request: Request,
+    bucket: Bucket = Depends()
 ) -> Response:
     try:
         minio_service = MinioService()
-        files = await minio_service.get_files_from_bucket('images')
+        files = await minio_service.get_files_from_bucket(bucket.bucket)
         files_schema = FilesSchema().urls = files
     except Exception as e:
         return await response_base.fail(
@@ -101,6 +101,7 @@ async def files(
     },
 )
 async def file(
+    nested_path: str = None,
     file: UploadFile = File(...),
     bucket: Bucket = Depends()
 ) -> ResponseModel:
@@ -114,7 +115,7 @@ async def file(
 
     minio_service = MinioService()
     try:
-        response_file = await minio_service.save_file(bucket.bucket, file)
+        response_file = await minio_service.save_file(bucket.bucket, file, nested_path)
         return await response_base.success(
             data={
                 'status': 'success',
