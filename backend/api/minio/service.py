@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import timedelta
 from io import BytesIO
 
 from fastapi import (
@@ -29,6 +30,7 @@ class MinioService:
     ) -> StreamingResponse | S3Error:
         response = None
         try:
+            await self.check_is_file_exist_in_minio(bucket_name, file_name)
             response = minio_client().get_object(bucket_name, file_name)
             return StreamingResponse(BytesIO(response.read()))
         except S3Error as e:
@@ -88,3 +90,21 @@ class MinioService:
         exist = minio_client().bucket_exists(bucket_name)
         if not exist:
             minio_client().make_bucket(bucket_name)
+
+    async def check_is_file_exist_in_minio(self, bucket_name: str, filename: str):
+        try:
+            minio_client().stat_object(bucket_name, filename)
+            return True
+        except Exception as err:
+            return False
+
+    async def get_temporary_url(self, bucket_name: str, filename: str) -> str:
+        # Get presigned URL string to download 'my-object' in
+        # 'my-bucket' with two hours expiry.
+        url = minio_client().get_presigned_url(
+            "GET",
+            bucket_name,
+            filename,
+            expires=timedelta(minutes=1),
+        )
+        return url
