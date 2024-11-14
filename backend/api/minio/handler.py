@@ -18,7 +18,7 @@ from starlette.responses import Response
 from api.minio.schemas import (
     GetFile,
     FilesSchema,
-    Bucket
+    Bucket, FileUrl
 )
 from api.minio.service import MinioService
 from common.response.response_chema import (
@@ -47,6 +47,33 @@ async def file(
     minio_service = MinioService()
     try:
         return await minio_service.get_file_url(file.bucket, file.file)
+    except S3Error as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "image": file.file,
+                "message": e.message,
+                "code": e.code
+            }
+        )
+
+
+@router.get(
+    "/temporary_file",
+    summary="get temporary file ulr",
+    description="return temporary link to file",
+)
+async def file(
+    file: FileUrl = Depends(),
+) -> Response:
+
+    minio_service = MinioService()
+    try:
+        url = await minio_service.get_temporary_url(file.bucket, file.file)
+        return await response_base.success(
+            res=CustomResponseCode.HTTP_200,
+            data={"url": url}
+        )
     except S3Error as e:
         return await response_base.fail(
             res=CustomResponseCode.HTTP_404,
