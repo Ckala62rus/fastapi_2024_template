@@ -108,3 +108,6 @@ class MinioService:
             expires=timedelta(minutes=1),
         )
         return url
+
+    async def remove_object(self, bucket_name: str, filename: str) -> None:
+        minio_client().remove_object(bucket_name, filename)
