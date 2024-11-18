@@ -195,3 +195,29 @@ async def video_file_upload(video: UploadFile = File(...)) -> ResponseModel:
             }
         }
     )
+
+@router.delete(
+    "/file",
+    summary="delete object",
+    description="dont know",
+)
+async def file(
+    file: GetFile = Depends(),
+) -> Response:
+
+    minio_service = MinioService()
+    try:
+        url = await minio_service.remove_object(file.bucket, file.file)
+        return await response_base.success(
+            res=CustomResponseCode.HTTP_200,
+            data=None,
+        )
+    except S3Error as e:
+        return await response_base.fail(
+            res=CustomResponseCode.HTTP_404,
+            data={
+                "image": file.file,
+                "message": e.message,
+                "code": e.code
+            }
+        )
