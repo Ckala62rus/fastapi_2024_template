@@ -85,6 +85,11 @@ minio - 'название контейнера minio' /
 127.0.0.1 minio
 ```  
 
+Файл из минио можно получить так
+http://localhost:8001/api/v1/minio/file?file=avatar/71d3de1b-bcef-4f41-8364-2595c2d1adf6.jpg&bucket=images
+или через Nginx как обратный реверс прокси
+http://localhost:88/images/660c358c-a59a-4b1f-8a12-c853e8ebd065.jpg
+
 ### Todo
 1. Добавить Celery (+)
 2. Фоновые задачи Celery (+)
