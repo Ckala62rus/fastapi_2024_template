@@ -15,11 +15,13 @@ RUN apt-get update && apt-get install -y \
     systemd \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install poetry-plugin-export
+
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
     && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list.d/debian.sources \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && pip install poetry && rm -rf /var/cache/apt \
-    && poetry export --without-hashes -f requirements.txt --output requirements.txt \
+#     && poetry export --without-hashes -f requirements.txt --output requirements.txt \
     && mkdir -p /var/log/fastapi_server
 
 ENV TZ = Europa/Moscow
