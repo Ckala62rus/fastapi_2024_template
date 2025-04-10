@@ -1,5 +1,8 @@
+from typing import Dict
+
 import pytest_asyncio
 
+from tests.utils.get_headers import get_token_headers
 
 PYTEST_EMAIL = 'admin@mail.ru'
 PYTEST_PASSWORD = '123123'
@@ -52,15 +55,12 @@ PYTEST_USERNAME = 'admin'
 #                 session.execute(f"""TRUNCATE TABLE {table_for_clearing};""")
 #
 #
-# @pytest.fixture(scope='module')
-# def token_headers(client: TestClient) -> Dict[str, str]:
-#     return get_token_headers(client=client, email=PYTEST_EMAIL, password=PYTEST_PASSWORD)
 import os
 import warnings
 
 import pytest
 from fastapi import FastAPI
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from asgi_lifespan import LifespanManager
 from databases import Database
 
@@ -74,6 +74,7 @@ from core.db import get_db
 
 import logging
 
+logging.basicConfig(level=logging.DEBUG)
 logger  = logging.getLogger(__name__)
 logger.info("Logging test info message")
 logger.debug("Logging test debug message")
@@ -105,6 +106,22 @@ def app(apply_migrations: None) -> FastAPI:
 @pytest_asyncio.fixture
 def db(app: FastAPI) -> AsyncSession:
     return get_db()
+
+@pytest_asyncio.fixture
+def log() -> logging.Logger:
+    return logger
+
+
+@pytest_asyncio.fixture(scope='session')
+async def async_client() -> AsyncClient:
+    async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+    ) as async_client:
+        return async_client
+
+# @pytest_asyncio.fixture()
+# async def token_headers(async_client: AsyncClient) -> Dict[str, str]:
+#     return await get_token_headers(client=async_client, email=PYTEST_EMAIL, password=PYTEST_PASSWORD)
 
 
 # @pytest.fixture
