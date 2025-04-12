@@ -75,9 +75,9 @@ from core.db import get_db
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-logger  = logging.getLogger(__name__)
-logger.info("Logging test info message")
-logger.debug("Logging test debug message")
+# logger  = logging.getLogger(__name__)
+# logger.info("Logging test info message")
+# logger.debug("Logging test debug message")
 
 
 # Apply migrations at beginning and end of testing session
@@ -85,7 +85,7 @@ logger.debug("Logging test debug message")
 def apply_migrations():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["TESTING"] = "1"
-    config = Config("alembic.ini")
+    config = Config("tests/alembic.ini")
 
     # logger.info(config)
 
@@ -107,9 +107,9 @@ def app(apply_migrations: None) -> FastAPI:
 def db(app: FastAPI) -> AsyncSession:
     return get_db()
 
-@pytest_asyncio.fixture
-def log() -> logging.Logger:
-    return logger
+# @pytest_asyncio.fixture
+# def log() -> logging.Logger:
+#     return logger
 
 
 @pytest_asyncio.fixture(scope='session')
