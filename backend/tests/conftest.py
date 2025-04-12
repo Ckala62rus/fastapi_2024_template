@@ -85,7 +85,7 @@ logging.basicConfig(level=logging.DEBUG)
 def apply_migrations():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     os.environ["TESTING"] = "1"
-    config = Config("alembic.ini")
+    config = Config("tests/alembic.ini")
 
     # logger.info(config)
 
