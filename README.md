@@ -111,7 +111,6 @@ http://localhost:88/images/660c358c-a59a-4b1f-8a12-c853e8ebd065.jpg
 - login => postgres
 - password => 123123
 
-```
 
 #### Testing
 
@@ -120,6 +119,20 @@ http://localhost:88/images/660c358c-a59a-4b1f-8a12-c853e8ebd065.jpg
 ```Bash
 pytest -vs --disable-warnings
 ```
+
+3. Запуск алембика для теста
+```Bash
+alembic -c tests/alembic.ini history
+```
+4. Создание миграций для тестов
+```Bash
+alembic -c tests/alembic.ini revision --autogenerate -m "init"
+```
+5. Запуск тестов
+```Bash
+pytest -v --pyargs tests --capture=no
+```
+- флаг --capture=no включает вывод логирования в консоль. (использовать при отладке)
 
 
 #### Celery
