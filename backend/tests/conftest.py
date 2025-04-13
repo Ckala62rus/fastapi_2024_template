@@ -1,7 +1,9 @@
 from typing import Dict
 
 import pytest_asyncio
+from starlette.testclient import TestClient
 
+from tests.utils.db import get_db_for_test
 from tests.utils.get_headers import get_token_headers
 
 PYTEST_EMAIL = 'admin@mail.ru'
@@ -95,15 +97,17 @@ def apply_migrations():
 
 
 # Create a new application for testing
-@pytest_asyncio.fixture
-def app(apply_migrations: None) -> FastAPI:
+@pytest_asyncio.fixture(scope="module")
+def app(apply_migrations: None) -> TestClient:
     from core.register import register_app
 
-    return register_app()
+    app = register_app()
+    app.dependency_overrides[get_db] = get_db_for_test
+    return  TestClient(app)
 
 
 # Grab a reference to our database when needed
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="module")
 def db(app: FastAPI) -> AsyncSession:
     return get_db()
 
