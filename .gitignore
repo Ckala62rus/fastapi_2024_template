@@ -4,3 +4,4 @@ venv/
 .idea/
 celerybeat-schedule
 docker/backup
+/.venv/
