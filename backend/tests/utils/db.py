@@ -15,13 +15,9 @@ Base = declarative_base()
 
 
 def create_engine_and_session(url: str | URL):
-    logging.info("++++++++++++++++++++++++++++++++++++++")
-    print(settings.SQLALCHEMY_DATABASE_URL_FOR_ALEMBIC_TESTING)
-    logging.info("++++++++++++++++++++++++++++++++++++++")
-
     try:
         # Core database
-        engine = create_async_engine(url, echo=True, future=True, pool_pre_ping=True)
+        engine = create_async_engine(url, echo=False, future=True, pool_pre_ping=True)
         # log.success('success connect to database')
     except Exception as e:
         log.error('❌ Error to connect database {}', e)
