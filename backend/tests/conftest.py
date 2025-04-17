@@ -1,10 +1,20 @@
-from typing import Dict
-
+import logging
+import os
+import warnings
+import alembic
+import pytest
 import pytest_asyncio
+
+from alembic.config import Config
+from alembic import command
 from starlette.testclient import TestClient
+from fastapi import FastAPI
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.utils.db import get_db_for_test
-from tests.utils.get_headers import get_token_headers
+from tests.utils.logger_project import logging_config
+from core.db import get_db
 
 PYTEST_EMAIL = 'admin@mail.ru'
 PYTEST_PASSWORD = '123123'
@@ -57,29 +67,12 @@ PYTEST_USERNAME = 'admin'
 #                 session.execute(f"""TRUNCATE TABLE {table_for_clearing};""")
 #
 #
-import os
-import warnings
 
-import pytest
-from fastapi import FastAPI
-from httpx import AsyncClient, ASGITransport
-from asgi_lifespan import LifespanManager
-from databases import Database
+logging.config.dictConfig(logging_config)
+logger = logging.getLogger(__name__)
 
-import alembic
-from alembic.config import Config
-from alembic import command
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.db import get_db
-
-
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-# logger  = logging.getLogger(__name__)
-# logger.info("Logging test info message")
-# logger.debug("Logging test debug message")
+logger.info("Logging new configuration")
+logger.debug("Logging new configuration")
 
 
 # Apply migrations at beginning and end of testing session
@@ -107,9 +100,14 @@ def app(apply_migrations: None) -> TestClient:
 
 
 # Grab a reference to our database when needed
-@pytest_asyncio.fixture(scope="module")
-def db(app: FastAPI) -> AsyncSession:
-    return get_db()
+# @pytest_asyncio.fixture(scope="module")
+# def db(app: FastAPI) -> AsyncSession:
+#     return get_db()
+
+
+@pytest.fixture(scope="module")
+def log(app: FastAPI) -> logging.Logger:
+    return logging.getLogger(__name__)
 
 # @pytest_asyncio.fixture
 # def log() -> logging.Logger:
