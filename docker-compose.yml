@@ -90,7 +90,7 @@ services:
     ports:
       - "6379:6379"
     container_name: fba_redis
-    restart: always
+#    restart: always
     environment:
       - TZ=Europe/Moscow
     volumes:

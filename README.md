@@ -133,7 +133,10 @@ alembic -c tests/alembic.ini revision --autogenerate -m "init"
 pytest -v --pyargs tests --capture=no
 ```
 - флаг --capture=no включает вывод логирования в консоль. (использовать при отладке)
-
+6. Запуск тестов с отключением warning предупреждений
+```Bash
+pytest -v --disable-warnings
+```
 
 #### Celery
 

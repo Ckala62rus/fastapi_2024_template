@@ -5,3 +5,11 @@ venv/
 celerybeat-schedule
 docker/backup
 /.venv/
+/backend/critical.log
+/backend/error.log
+/backend/log.log
+/critical.log
+/error.log
+/log.log
+/backend/tests/migrations/versions/fa103e1a0915_init.py
+/backend/logs/pytest-logs.txt
