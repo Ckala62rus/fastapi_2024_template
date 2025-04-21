@@ -4,7 +4,6 @@ from unittest.mock import patch, MagicMock
 
 from common.security.jwt import sign_jwt, decode_jwt
 from common.log import logger
-from core.db_redis import RedisCli
 
 
 logger = logging.getLogger(__name__)
@@ -16,12 +15,6 @@ logging.basicConfig(
 
 
 class TestJWT(unittest.IsolatedAsyncioTestCase):
-    # def setUp(self):
-    #     logger.debug(f'seUp. is running \n')
-    #
-    # def tearDown(self):
-    #     logger.debug(f'\n tearDown. test were finished')
-
     async def test_jwt(self):
         # arrange
         user_id = 7
@@ -45,3 +38,4 @@ class TestJWT(unittest.IsolatedAsyncioTestCase):
 
         # assert
         self.assertEqual(user_id, token_info["user_id"])
+        self.assertEqual(redis_client.get.call_count, 1)
