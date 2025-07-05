@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy import create_engine, URL
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
 from common.log import log
 from core.config import settings
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -26,6 +27,7 @@ def create_engine_and_session(url: str | URL):
 
 
 async_engine, async_db_session = create_engine_and_session(settings.SQLALCHEMY_DATABASE_URL)
+# async_engine, async_db_session = create_engine_and_session(settings.SQLALCHEMY_DATABASE_URL_FOR_ALEMBIC_TESTING)
 
 
 async def get_db() -> AsyncSession:
