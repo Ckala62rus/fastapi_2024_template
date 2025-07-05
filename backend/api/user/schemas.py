@@ -78,7 +78,7 @@ class MeSchema(AuthSchemaCreatedNewUser):
     # Для того, что бы можно было перегонять данные из модели
     # MeSchema(**user)
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PaginationSchema(SchemaBase):

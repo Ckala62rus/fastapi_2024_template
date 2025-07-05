@@ -138,6 +138,8 @@ class UserService:
             raise HTTPException(f"User with id {user_id} not found")
         return MeSchema(**user.__dict__)
 
+# todo сделать отмену обычного токена и переделать логику.
+# рефреш токен не меняется до тех пор пока не протухнет!
     @staticmethod
     async def token_refresh(
             *,

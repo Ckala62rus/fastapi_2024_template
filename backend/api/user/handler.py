@@ -21,6 +21,7 @@ from api.user.service import (
     UserService,
     user_service
 )
+from common.log import log
 from common.response.response_chema import (
     response_base,
     ResponseModel
@@ -51,12 +52,16 @@ async def registration(
     try:
         created_user = await UserService().registration(credentials, db)
     except HTTPException as e:
+        log.info(f"{e}")
         return await response_base.fail(
             res=CustomResponseCode.HTTP_400,
             data=f"User with {credentials.email} if exists"
         )
     except Exception as e:
+        log.info(f"{e}")
         return await response_base.fail(data=str(e))
+
+    log.info(f"{created_user.dict}")
     return await response_base.success(
         res=CustomResponseCode.HTTP_201,
         data=created_user
@@ -74,6 +79,8 @@ async def login(
 ) -> ResponseModel:
     try:
         result = await UserService().login(credentials, db)
+
+        log.info(f"{result}")
         return await response_base.success(
             res=CustomResponseCode.HTTP_200,
             data=result.model_dump()
