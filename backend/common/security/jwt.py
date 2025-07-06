@@ -65,6 +65,20 @@ async def decode_jwt(token: str) -> dict:
         return {}
 
 
+async def decode_refresh_jwt(token: str) -> dict:
+    """
+    Decode refresh token without Redis validation
+    
+    :param token: The refresh token to decode
+    :return: Decoded token payload or empty dict if invalid
+    """
+    try:
+        decoded_token = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        return decoded_token if decoded_token["expires"] >= time.time() else {}
+    except Exception as e:
+        return {}
+
+
 async def get_hash_password(password: str) -> str:
     """
     Encrypt passwords using the hash algorithm

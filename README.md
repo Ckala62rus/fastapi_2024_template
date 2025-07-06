@@ -138,6 +138,11 @@ pytest -v --pyargs tests --capture=no
 pytest -v --disable-warnings
 ```
 
+7.Запуск всез тестов через Docker
+```Bash
+docker-compose exec backend_fastapi_2024 python -m pytest tests/api_v1/ -v --tb=short
+```
+
 #### Celery
 
 
